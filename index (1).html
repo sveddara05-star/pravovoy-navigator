@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Правовой навигатор v6.1</title>
+<style>
+  :root{
+    --ink:#05060a; --ink-2:#0a0d16;
+    --navy:#0f1524; --navy-2:#151c30; --slate:#1c2438;
+    --bordeaux:#5c1a2b; --bordeaux-2:#7a2438; --wine:#8b1e3f; --ruby:#a82148;
+    --line:rgba(255,255,255,.06); --line-2:rgba(255,255,255,.1); --line-strong:rgba(255,255,255,.16);
+    --text:#e8eaf0; --text-2:#a8b0c2; --muted:#6b7488;
+    --accent:#c9a961; --accent-2:#34d399; --danger:#e0525e;
+    --p1:#6ea8dc; --p2:#d47a9c; --gold:#d4af6a;
+    --r:14px; --r-sm:10px;
+  }
+  body.theme-light{
+    --ink:#f4f6fa; --ink-2:#eef1f7;
+    --navy:#ffffff; --navy-2:#f8fafc; --slate:#e8ecf3;
+    --line:rgba(0,0,0,.06); --line-2:rgba(0,0,0,.1); --line-strong:rgba(0,0,0,.16);
+    --text:#1a1d27; --text-2:#4a5065; --muted:#7b8198;
+    --accent:#a88740; --accent-2:#059669; --danger:#dc2626;
+    --bordeaux:#7a2438; --bordeaux-2:#8b2e44; --gold:#a88740;
+  }
+  body.theme-sepia{
+    --ink:#f2e8d5; --ink-2:#ebe0ca;
+    --navy:#faf3e3; --navy-2:#f5ecdc; --slate:#e8dcc4;
+    --line:rgba(80,60,30,.1); --line-2:rgba(80,60,30,.15); --line-strong:rgba(80,60,30,.25);
+    --text:#3d2f1a; --text-2:#6b5638; --muted:#8a7351;
+    --accent:#8b5a1f; --accent-2:#4a7c4a; --danger:#a83232;
+    --bordeaux:#6b2a1f; --bordeaux-2:#7d3428; --gold:#8b5a1f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Inter','Manrope',-apple-system,'Segoe UI',system-ui,sans-serif;
+    background:var(--ink); color:var(--text); min-height:100vh; padding:14px;
+    display:flex; justify-content:center; line-height:1.5;
+    letter-spacing:.005em; -webkit-font-smoothing:antialiased;
+    position:relative; overflow-x:hidden;
+    transition:background .3s, color .3s;
+  }
+  body::before{
+    content:''; position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(92,26,43,.35), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(15,21,36,.9), transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(139,30,63,.08), transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  body.theme-light::before, body.theme-sepia::before{
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(201,169,97,.15), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(139,30,63,.05), transparent 60%);
+  }
+  .app{width:100%; max-width:760px; padding-bottom:30px; position:relative; z-index:1;}
+
+  header{text-align:center; padding:16px 0 10px;}
+  .brand{
+    display:inline-flex; align-items:center; gap:10px; padding:7px 16px; border-radius:100px;
+    background:linear-gradient(180deg, rgba(28,36,56,.6), rgba(15,21,36,.6));
+    border:1px solid var(--line-2); backdrop-filter:blur(12px);
+    margin-bottom:12px;
+  }
+  body.theme-light .brand, body.theme-sepia .brand{
+    background:linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.5));
+  }
+  .brand-logo{font-size:20px;}
+  .brand-title{font-size:13px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase; color:var(--text-2);}
+  h1.app-title{
+    font-size:clamp(22px,5vw,30px); font-weight:700; letter-spacing:-.03em;
+    background:linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--ruby) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.15; margin-bottom:6px;
+  }
+  .subtitle{color:var(--muted); font-size:12px;}
+
+  .hud{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:16px 0 12px;}
+  .hud-item{
+    background:linear-gradient(180deg, rgba(28,36,56,.5), rgba(15,21,36,.7));
+    border:1px solid var(--line); border-radius:var(--r-sm); padding:10px 8px;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  body.theme-light .hud-item, body.theme-sepia .hud-item{
+    background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.5));
+  }
+  .hud-item .label{font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; font-weight:600; margin-bottom:3px;}
+  .hud-item .value{font-size:16px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums;}
+  .hud-item .value.gold{color:var(--gold);}
+
+  .progress-wrap{height:4px; background:rgba(148,163,184,.15); border-radius:100px; overflow:hidden; margin-bottom:18px;}
+  .progress-bar{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--bordeaux-2), var(--ruby), var(--accent));
+    background-size:200% 100%; animation:shine 3s linear infinite;
+    transition:width .6s cubic-bezier(.4,0,.2,1); border-radius:100px;
+  }
+  @keyframes shine{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+
+  .card{
+    background:linear-gradient(180deg, rgba(20,26,44,.7), rgba(10,13,22,.85));
+    backdrop-filter:blur(20px);
+    border-radius:var(--r); padding:22px; border:1px solid var(--line-2);
+    box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 30px 60px -30px rgba(0,0,0,.9);
+    position:relative; overflow:hidden;
+  }
+  body.theme-light .card, body.theme-sepia .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.7));
+  }
+  .card::before{
+    content:''; position:absolute; top:0; left:20%; right:20%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity:.5;
+  }
+  .slide-in{animation:slideIn .5s cubic-bezier(.16,1,.3,1);}
+  @keyframes slideIn{from{opacity:0; transform:translateY(20px);}to{opacity:1; transform:none;}}
+
+  .block-tag{
+    display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700;
+    letter-spacing:1.2px; text-transform:uppercase; padding:5px 12px; border-radius:100px;
+    background:rgba(92,26,43,.4); color:#e8a4b8; border:1px solid rgba(168,33,72,.35); margin-bottom:14px;
+  }
+  .block-tag::before{content:''; width:5px; height:5px; border-radius:50%; background:var(--ruby); box-shadow:0 0 8px var(--ruby);}
+
+  .level-title{font-size:20px; font-weight:700; margin-bottom:16px; color:var(--text); letter-spacing:-.025em;}
+
+  .situation{
+    background:linear-gradient(180deg, rgba(5,6,10,.6), rgba(15,21,36,.4));
+    border:1px solid var(--line); border-left:3px solid var(--bordeaux-2);
+    padding:14px 18px; border-radius:var(--r-sm); margin-bottom:18px;
+    line-height:1.65; font-size:14.5px; color:var(--text-2); position:relative;
+  }
+  body.theme-light .situation, body.theme-sepia .situation{
+    background:linear-gradient(180deg, rgba(0,0,0,.03), transparent);
+  }
+  .situation::before{
+    content:attr(data-label); position:absolute; top:-9px; left:14px; padding:0 8px;
+    background:var(--navy); font-size:9px; font-weight:700; letter-spacing:1.4px; color:var(--muted);
+  }
+
+  .question{
+    font-weight:600; margin-bottom:14px; font-size:15px; color:var(--text);
+    display:flex; align-items:flex-start; gap:8px;
+  }
+  .question::before{
+    content:'?'; flex-shrink:0; width:22px; height:22px; border-radius:50%;
+    background:linear-gradient(135deg, var(--bordeaux-2), var(--ruby)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
+    margin-top:1px;
+  }
+
+  .options{display:flex; flex-direction:column; gap:9px; counter-reset:opt;}
+  .option{
+    background:linear-gradient(180deg, rgba(28,36,56,.4), rgba(15,21,36,.5));
+    border:1px solid var(--line-2); border-radius:var(--r-sm); padding:14px 16px;
+    cursor:pointer; transition:all .22s; font-size:14.5px;
+    color:var(--text); text-align:left; font-family:inherit; font-weight:500;
+    display:flex; align-items:center; gap:12px;
+  }
+  body.theme-light .option, body.theme-sepia .option{
+    background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.04));
+  }
+  .option::before{
+    content:counter(opt, decimal-leading-zero); counter-increment:opt;
+    flex-shrink:0; width:28px; height:28px; border-radius:8px;
+    background:rgba(148,163,184,.1); border:1px solid var(--line-2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:var(--muted);
+  }
+  .option:hover:not(.disabled){
+    border-color:var(--accent);
+    transform:translateX(3px);
+  }
+  .option.correct{border-color:var(--accent-2); background:rgba(52,211,153,.1); animation:pulse .5s;}
+  .option.correct::before{content:"✓"; background:var(--accent-2); color:#fff; border-color:var(--accent-2);}
+  .option.wrong{border-color:var(--danger); background:rgba(224,82,94,.1); animation:shake .4s;}
+  .option.wrong::before{content:"✕"; background:var(--danger); color:#fff; border-color:var(--danger);}
+  .option.disabled{cursor:default;}
+  .option.p1-pick{border-color:var(--p1); background:rgba(110,168,220,.1);}
+  .option.p2-pick{border-color:var(--p2); background:rgba(212,122,156,.1);}
+
+  @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.015);}100%{transform:scale(1);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+
+  .feedback{margin-top:16px; padding:16px 18px; border-radius:var(--r-sm); font-size:13.5px; line-height:1.65; display:none;}
+  .feedback.show{display:block; animation:slideIn .35s;}
+  .feedback.ok{background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.25); border-left:3px solid var(--accent-2); color:var(--text-2);}
+  .feedback.no{background:rgba(224,82,94,.08); border:1px solid rgba(224,82,94,.25); border-left:3px solid var(--danger); color:var(--text-2);}
+  .feedback strong{color:var(--text);}
+  .feedback .ref{
+    display:inline-block; margin-top:10px; font-size:11px;
+    background:rgba(201,169,97,.12); color:var(--accent); padding:4px 10px; border-radius:100px;
+    font-weight:600; border:1px solid rgba(201,169,97,.25);
+  }
+
+  .btn{
+    margin-top:14px; width:100%; padding:14px;
+    background:linear-gradient(180deg, var(--bordeaux-2), var(--bordeaux));
+    border:1px solid rgba(255,255,255,.1); border-radius:var(--r-sm);
+    color:#fff; font-size:14.5px; font-weight:700; cursor:pointer;
+    transition:all .2s; font-family:inherit;
+    box-shadow:0 8px 20px -8px rgba(139,30,63,.6);
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .btn.ghost{background:transparent; border:1px solid var(--line-strong); color:var(--text); box-shadow:none;}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent);}
+  .btn.p2{background:linear-gradient(180deg, #7a3f57, #5c2942);}
+  .btn.gold{background:linear-gradient(180deg, #c9a961, #a88740); color:#0a0d16;}
+  .btn.sm{padding:10px; font-size:13px; margin-top:8px;}
+
+  .duel-header{
+    display:flex; justify-content:space-between; align-items:center; padding:10px 14px;
+    background:linear-gradient(180deg, rgba(5,6,10,.7), rgba(15,21,36,.5));
+    border:1px solid var(--line-2); border-radius:var(--r-sm); margin-bottom:16px;
+    font-size:13px; font-weight:700; gap:8px; flex-wrap:wrap;
+  }
+  .duel-header .p1{color:var(--p1);}
+  .duel-header .p2{color:var(--p2);}
+  .turn-badge{padding:5px 14px; border-radius:100px; font-size:10px; font-weight:700; text-transform:uppercase;}
+  .turn-badge.p1{background:rgba(110,168,220,.12); color:var(--p1); border:1px solid rgba(110,168,220,.35);}
+  .turn-badge.p2{background:rgba(212,122,156,.12); color:var(--p2); border:1px solid rgba(212,122,156,.35);}
+  .duel-hint{text-align:center; color:var(--muted); font-size:12px; margin-bottom:12px;}
+
+  .result-screen{text-align:center; padding:32px 22px;}
+  .result-screen .big{font-size:64px; margin-bottom:14px; animation:float 2.5s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  .result-screen h2{
+    font-size:24px; margin-bottom:10px;
+    background:linear-gradient(135deg, var(--text), var(--accent));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .result-screen p{color:var(--text-2); margin-bottom:22px; line-height:1.7; font-size:14px;}
+  .achievement{
+    display:inline-block; padding:7px 16px; border-radius:100px;
+    background:rgba(201,169,97,.15);
+    border:1px solid rgba(201,169,97,.4); color:var(--gold);
+    font-weight:700; margin:4px; font-size:11.5px;
+  }
+
+  .quote-block{
+    margin:20px 0; padding:16px;
+    background:linear-gradient(180deg, rgba(92,26,43,.15), rgba(15,21,36,.2));
+    border-left:3px solid var(--accent);
+    border-radius:var(--r-sm);
+    font-style:italic; color:var(--text-2); font-size:13px; line-height:1.7;
+    text-align:left;
+  }
+  .quote-block .author{display:block; margin-top:8px; font-style:normal; font-weight:700; color:var(--accent); font-size:11.5px;}
+
+  .start-screen{text-align:center; padding:28px 22px;}
+  .start-screen .logo{font-size:64px; margin-bottom:12px; animation:float 3s ease-in-out infinite; display:inline-block;}
+  .start-screen h2{font-size:24px; margin-bottom:12px; letter-spacing:-.02em;}
+  .start-screen p{color:var(--text-2); line-height:1.7; margin-bottom:20px; font-size:14px; max-width:420px; margin-left:auto; margin-right:auto;}
+  .menu-buttons{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .menu-buttons .btn{margin-top:0;}
+  .menu-buttons .full{grid-column:1 / -1;}
+  .menu-buttons .btn small{display:block; font-weight:400; font-size:11px; opacity:.75; margin-top:2px;}
+
+  .ref-list{display:flex; flex-direction:column; gap:9px; max-height:60vh; overflow-y:auto; padding-right:6px; margin-top:4px;}
+  .ref-item{
+    background:linear-gradient(180deg, rgba(28,36,56,.4), rgba(15,21,36,.5));
+    border:1px solid var(--line); border-left:3px solid var(--bordeaux-2);
+    border-radius:var(--r-sm); padding:14px 16px; transition:all .22s;
+  }
+  body.theme-light .ref-item, body.theme-sepia .ref-item{background:rgba(0,0,0,.02);}
+  .ref-item:hover{transform:translateX(3px); border-left-color:var(--accent);}
+  .ref-item .code{font-size:10.5px; font-weight:700; color:var(--accent); margin-bottom:5px; letter-spacing:.8px;}
+  .ref-item .name{font-size:14px; color:var(--text); margin-bottom:6px; font-weight:600;}
+  .ref-item .text{font-size:12.5px; color:var(--text-2); line-height:1.6;}
+
+  .search-box{
+    width:100%; padding:11px 14px;
+    background:rgba(5,6,10,.6); border:1px solid var(--line-2);
+    border-radius:var(--r-sm); color:var(--text); font-family:inherit;
+    font-size:14px; outline:none; margin-bottom:12px;
+  }
+  body.theme-light .search-box, body.theme-sepia .search-box{background:rgba(255,255,255,.7);}
+  .search-box:focus{border-color:var(--accent);}
+  .search-box::placeholder{color:var(--muted);}
+
+  .tabs{display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;}
+  .tab{
+    padding:7px 14px; background:rgba(28,36,56,.4); border:1px solid var(--line-2);
+    border-radius:100px; font-size:11.5px; cursor:pointer; color:var(--muted);
+    font-family:inherit; transition:all .2s; font-weight:600;
+  }
+  body.theme-light .tab, body.theme-sepia .tab{background:rgba(0,0,0,.03);}
+  .tab.active{background:rgba(92,26,43,.5); color:#e8a4b8; border-color:rgba(168,33,72,.5);}
+
+  .top-bar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .top-bar h2{font-size:18px; display:flex; align-items:center; gap:8px;}
+
+  .icon-btn{
+    background:rgba(28,36,56,.5); border:1px solid var(--line-2); color:var(--text-2);
+    width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:14px;
+    display:flex; align-items:center; justify-content:center; transition:all .25s;
+  }
+  body.theme-light .icon-btn, body.theme-sepia .icon-btn{background:rgba(0,0,0,.03);}
+  .icon-btn:hover{border-color:var(--ruby); color:var(--text); transform:rotate(90deg);}
+
+  .lb-row{
+    display:flex; align-items:center; gap:12px; padding:12px 14px;
+    background:linear-gradient(180deg, rgba(28,36,56,.35), rgba(15,21,36,.5));
+    border:1px solid var(--line); border-radius:var(--r-sm); margin-bottom:7px;
+    position:relative; overflow:hidden;
+  }
+  body.theme-light .lb-row, body.theme-sepia .lb-row{background:rgba(0,0,0,.02);}
+  .lb-row::before{content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg, var(--bordeaux-2), var(--ruby));}
+  .lb-rank{flex-shrink:0; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; background:rgba(148,163,184,.1); border:1px solid var(--line-2); color:var(--muted);}
+  .lb-rank.gold{background:linear-gradient(135deg, #c9a961, #a88740); color:#fff; border:none;}
+  .lb-rank.silver{background:linear-gradient(135deg, #b8c0cc, #7a8492); color:#fff; border:none;}
+  .lb-rank.bronze{background:linear-gradient(135deg, #c08457, #8b5a2b); color:#fff; border:none;}
+  .lb-name{flex:1; font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .lb-meta{font-size:10.5px; color:var(--muted); margin-top:2px;}
+  .lb-score{font-size:16px; font-weight:700; color:var(--gold);}
+
+  .empty-lb{text-align:center; padding:40px 20px; color:var(--muted); font-size:13px;}
+
+  .name-input{
+    width:100%; padding:13px 16px; background:rgba(5,6,10,.6);
+    border:1px solid var(--line-2); border-radius:var(--r-sm); color:var(--text);
+    font-family:inherit; font-size:14.5px; outline:none; margin-top:10px;
+  }
+  body.theme-light .name-input, body.theme-sepia .name-input{background:rgba(255,255,255,.7);}
+  .name-input:focus{border-color:var(--accent);}
+
+  .stats-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px;}
+  .stat-card{
+    background:linear-gradient(180deg, rgba(28,36,56,.4), rgba(15,21,36,.5));
+    border:1px solid var(--line); border-radius:var(--r-sm); padding:14px;
+  }
+  body.theme-light .stat-card, body.theme-sepia .stat-card{background:rgba(0,0,0,.02);}
+  .stat-card .label{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; font-weight:600; margin-bottom:6px;}
+  .stat-card .num{font-size:24px; font-weight:800; color:var(--accent); letter-spacing:-.03em;}
+  .stat-card .sub{font-size:11px; color:var(--text-2); margin-top:2px;}
+
+  .map-container{
+    position:relative; width:100%; height:420px;
+    background:radial-gradient(ellipse at center, rgba(92,26,43,.15), transparent 70%);
+    border:1px solid var(--line); border-radius:var(--r); overflow:hidden;
+  }
+  .map-svg{position:absolute; inset:0; width:100%; height:100%;}
+  .map-node{
+    position:absolute; transform:translate(-50%,-50%);
+    width:70px; height:70px; border-radius:50%;
+    background:linear-gradient(180deg, rgba(92,26,43,.9), rgba(60,17,28,.9));
+    border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; cursor:pointer;
+    transition:all .3s; box-shadow:0 8px 24px -8px rgba(0,0,0,.8);
+    z-index:2;
+  }
+  .map-node:hover{transform:translate(-50%,-50%) scale(1.15);}
+  .map-node.locked{opacity:.35; filter:grayscale(.8);}
+  .map-node.locked::after{
+    content:'🔒'; position:absolute; bottom:-6px; right:-6px;
+    background:var(--ink-2); border-radius:50%; width:24px; height:24px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; border:1px solid var(--line-2);
+  }
+  .map-node-label{
+    position:absolute; transform:translate(-50%,30px);
+    font-size:11px; color:var(--text-2); font-weight:600;
+    text-align:center; white-space:nowrap; pointer-events:none;
+  }
+
+  .flashcard{width:100%; min-height:280px; perspective:1000px; cursor:pointer; margin-bottom:16px;}
+  .flashcard-inner{position:relative; width:100%; min-height:280px; transition:transform .7s; transform-style:preserve-3d;}
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .flashcard-face{
+    position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    background:linear-gradient(180deg, rgba(28,36,56,.6), rgba(15,21,36,.7));
+    border:1px solid var(--line-2); border-radius:var(--r);
+    padding:28px 24px; display:flex; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center;
+  }
+  body.theme-light .flashcard-face, body.theme-sepia .flashcard-face{background:rgba(255,255,255,.8);}
+  .flashcard-face.back{transform:rotateY(180deg); background:linear-gradient(180deg, rgba(92,26,43,.3), rgba(15,21,36,.5));}
+  .flashcard-face .fc-code{font-size:12px; color:var(--accent); font-weight:700; letter-spacing:1.2px; margin-bottom:14px;}
+  .flashcard-face .fc-name{font-size:20px; color:var(--text); font-weight:700; letter-spacing:-.02em; line-height:1.3;}
+  .flashcard-face .fc-hint{font-size:11px; color:var(--muted); margin-top:18px;}
+  .flashcard-face .fc-text{font-size:14.5px; color:var(--text-2); line-height:1.7;}
+
+  .character-bubble{
+    display:flex; gap:12px; align-items:flex-start;
+    background:linear-gradient(180deg, rgba(28,36,56,.5), rgba(15,21,36,.6));
+    border:1px solid var(--line-2); border-radius:var(--r-sm);
+    padding:14px 16px; margin-bottom:14px;
+  }
+  body.theme-light .character-bubble, body.theme-sepia .character-bubble{background:rgba(0,0,0,.03);}
+  .character-avatar{
+    flex-shrink:0; width:48px; height:48px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; background:linear-gradient(135deg, rgba(201,169,97,.2), rgba(92,26,43,.3));
+    border:1px solid rgba(201,169,97,.35);
+  }
+  .character-content{flex:1;}
+  .character-name{font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px;}
+  .character-text{font-size:13.5px; color:var(--text-2); line-height:1.6;}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(5,6,10,.85);
+    backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:linear-gradient(180deg, rgba(20,26,44,.95), rgba(10,13,22,.98));
+    border:1px solid var(--line-strong); border-radius:var(--r);
+    padding:24px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
+  }
+  body.theme-light .modal, body.theme-sepia .modal{background:rgba(255,255,255,.98);}
+  .modal h2{font-size:20px; margin-bottom:12px;}
+  .modal p{color:var(--text-2); line-height:1.6; font-size:14px; margin-bottom:16px;}
+  .modal textarea, .modal input[type=text]{
+    width:100%; padding:12px; background:rgba(5,6,10,.6);
+    border:1px solid var(--line-2); border-radius:var(--r-sm);
+    color:var(--text); font-family:monospace; font-size:11px;
+    outline:none; resize:vertical; margin-bottom:8px;
+  }
+  body.theme-light .modal textarea, body.theme-light .modal input[type=text],
+  body.theme-sepia .modal textarea, body.theme-sepia .modal input[type=text]{background:rgba(0,0,0,.03);}
+  .modal-buttons{display:flex; gap:8px; margin-top:14px;}
+  .modal-buttons .btn{margin-top:0; flex:1;}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px);
+    background:linear-gradient(180deg, rgba(30,41,59,.95), rgba(15,21,36,.98));
+    border:1px solid rgba(201,169,97,.4); border-radius:100px;
+    padding:12px 22px; font-size:13px; font-weight:600;
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.8);
+    z-index:200; transition:transform .35s cubic-bezier(.16,1,.3,1);
+    max-width:90vw;
+  }
+  body.theme-light .toast, body.theme-sepia .toast{background:rgba(255,255,255,.98); color:var(--text);}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .ach-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  .ach-card{
+    background:linear-gradient(180deg, rgba(28,36,56,.4), rgba(15,21,36,.5));
+    border:1px solid var(--line); border-radius:var(--r-sm); padding:14px; text-align:center;
+  }
+  body.theme-light .ach-card, body.theme-sepia .ach-card{background:rgba(0,0,0,.02);}
+  .ach-card.unlocked{border-color:rgba(201,169,97,.4); background:linear-gradient(180deg, rgba(201,169,97,.08), rgba(92,26,43,.08));}
+  .ach-card .icon{font-size:32px; margin-bottom:6px; display:block; filter:grayscale(1) opacity(.3);}
+  .ach-card.unlocked .icon{filter:none;}
+  .ach-card .name{font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:3px;}
+  .ach-card.unlocked .name{color:var(--gold);}
+  .ach-card .desc{font-size:10.5px; color:var(--muted); line-height:1.4;}
+
+  .jury-steps{display:flex; gap:4px; justify-content:center; margin-bottom:16px;}
+  .jury-step{flex:1; height:4px; border-radius:100px; background:rgba(148,163,184,.15);}
+  .jury-step.done{background:linear-gradient(90deg, var(--bordeaux-2), var(--ruby));}
+  .jury-step.active{background:linear-gradient(90deg, var(--gold), var(--accent));}
+
+  .theme-switcher{display:flex; gap:6px; margin-bottom:16px;}
+  .theme-opt{
+    flex:1; padding:10px; border:1px solid var(--line-2); border-radius:var(--r-sm);
+    background:rgba(28,36,56,.4); cursor:pointer; text-align:center;
+    font-size:11px; color:var(--text-2); font-weight:600; transition:all .2s;
+  }
+  .theme-opt.active{border-color:var(--accent); color:var(--accent); background:rgba(201,169,97,.1);}
+
+  .certificate{
+    background:linear-gradient(135deg, #fdf6e3, #f5e6c8);
+    border:3px double #a88740; border-radius:var(--r);
+    padding:30px 24px; text-align:center; color:#3d2f1a;
+    font-family:'Georgia', serif; margin-bottom:16px;
+    position:relative;
+  }
+  .certificate::before{
+    content:''; position:absolute; inset:8px;
+    border:1px solid rgba(168,135,64,.4); border-radius:8px; pointer-events:none;
+  }
+  .certificate h3{font-size:22px; margin-bottom:10px; color:#7a2438;}
+  .certificate .sub{font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#8b5a1f; margin-bottom:16px;}
+  .certificate .name{font-size:26px; font-weight:700; margin:14px 0; color:#3d2f1a; border-bottom:1px solid #a88740; display:inline-block; padding:0 20px 6px;}
+  .certificate .desc{font-size:13px; line-height:1.7; margin-top:14px; color:#5a4a30;}
+
+  @media(max-width:520px){
+    .menu-buttons{grid-template-columns:1fr;}
+    .map-container{height:380px;}
+    .map-node{width:58px; height:58px; font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <span class="brand-logo">⚖️</span>
+      <span class="brand-title">Legal Navigator</span>
+    </div>
+    <h1 class="app-title" id="main-title">Правовой навигатор</h1>
+    <p class="subtitle" id="subtitle-text">Игра-тренажёр по праву для подростков · v6.1</p>
+  </header>
+
+  <div class="hud" id="hud" style="display:none">
+    <div class="hud-item"><div class="label" id="hud-l1">Прогресс</div><div class="value" id="hud-level">1</div></div>
+    <div class="hud-item"><div class="label" id="hud-l2">Очки</div><div class="value gold" id="hud-score">0</div></div>
+    <div class="hud-item"><div class="label" id="hud-l3">Блок</div><div class="value" id="hud-block" style="font-size:13px">—</div></div>
+  </div>
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- START -->
+  <div class="card start-screen slide-in" id="start-screen">
+    <div class="logo">⚖️</div>
+    <h2 id="welcome-title">Правовой навигатор</h2>
+    <p id="welcome-sub">Разбирайся в реальных правовых ситуациях. Играй один, с другом, на карте города или в суде присяжных.</p>
+    <div class="menu-buttons">
+      <button class="btn" onclick="startSingle()" id="btn-single">👤 <span>Одиночная</span><small id="btn-single-s">15 уровней</small></button>
+      <button class="btn p2" onclick="startDuel()" id="btn-duel">⚔️ <span>Дуэль</span><small id="btn-duel-s">2 игрока</small></button>
+      <button class="btn gold" onclick="showMap()" id="btn-map">🗺 <span>Карта города</span><small id="btn-map-s">локации</small></button>
+      <button class="btn gold" onclick="showJuryIntro()" id="btn-jury">⚖️ <span>Присяжные</span><small id="btn-jury-s">вердикт</small></button>
+      <button class="btn" style="background:linear-gradient(180deg,#4a3a5c,#2a1f3a)" onclick="showAdvocateIntro()" id="btn-adv">🏛 <span>Адвокат</span><small id="btn-adv-s">сюжет</small></button>
+      <button class="btn" style="background:linear-gradient(180deg,#3a4a5c,#1f2a3a)" onclick="startFlashcards()" id="btn-fc">🎴 <span>Флешкарты</span><small id="btn-fc-s">тренировка</small></button>
+      <button class="btn" onclick="startDaily()" id="daily-btn" style="background:linear-gradient(180deg,#4a3a5c,#2a1f3a)">📅 <span id="daily-btn-text">Кейс дня</span><small id="btn-daily-s">ежедневно</small></button>
+      <button class="btn ghost" onclick="showLeaderboard()" id="btn-lb">🏆 <span>Лидеры</span><small id="btn-lb-s">топ-20</small></button>
+      <button class="btn ghost full" onclick="showReference()" id="btn-ref">📚 <span>Справочник статей</span><small id="btn-ref-s">УК · КоАП · Конституция</small></button>
+      <button class="btn ghost" onclick="showProfile()" id="btn-prof">👤 <span>Профиль</span><small id="btn-prof-s">статистика</small></button>
+      <button class="btn ghost" onclick="showSettings()" id="btn-set">⚙️ <span>Настройки</span><small id="btn-set-s">тема · язык</small></button>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="card slide-in" id="game-screen" style="display:none">
+    <div class="character-bubble" id="character-bubble" style="display:none">
+      <div class="character-avatar" id="character-avatar">👨‍⚖️</div>
+      <div class="character-content">
+        <div class="character-name" id="character-name">Наставник</div>
+        <div class="character-text" id="character-text"></div>
+      </div>
+    </div>
+    <div class="duel-header" id="duel-header" style="display:none">
+      <span class="p1"><span id="duel-p1-label">🔵 Игрок 1</span>: <span id="duel-p1">0</span></span>
+      <span class="turn-badge p1" id="turn-badge">Ход 1</span>
+      <span class="p2"><span id="duel-p2-label">🟣 Игрок 2</span>: <span id="duel-p2">0</span></span>
+    </div>
+    <div class="jury-steps" id="jury-steps" style="display:none"></div>
+    <span class="block-tag" id="block-tag">Блок</span>
+    <h2 class="level-title" id="level-title"></h2>
+    <div class="situation" id="situation" data-label="СИТУАЦИЯ"></div>
+    <div class="question" id="question"></div>
+    <div class="duel-hint" id="duel-hint" style="display:none"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="btn" id="next-btn" style="display:none" onclick="nextLevel()">Далее →</button>
+  </div>
+
+  <!-- MAP -->
+  <div class="card slide-in" id="map-screen" style="display:none">
+    <div class="top-bar">
+      <h2 id="map-title">🗺 Правовой город</h2>
+      <button class="icon-btn" onclick="backToMenu()">✕</button>
+    </div>
+    <div class="map-container" id="map-container"></div>
+    <p style="color:var(--muted); font-size:12px; margin-top:12px; text-align:center;" id="map-hint">
+      Нажми на локацию, чтобы открыть кейс. Локации открываются по мере прохождения.
+    </p>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="card slide-in" id="fc-screen" style="display:none">
+    <div class="top-bar">
+      <h2 id="fc-title">🎴 Флешкарты</h2>
+      <button class="icon-btn" onclick="backToMenu()">✕</button>
+    </div>
+    <p style="color:var(--muted); font-size:12px; margin-bottom:14px; text-align:center;" id="fc-hint">
+      Нажми на карточку, чтобы перевернуть
+    </p>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner">
+        <div class="flashcard-face front">
+          <div class="fc-code" id="fc-code">ст. 20 УК РФ</div>
+          <div class="fc-name" id="fc-name">Название статьи</div>
+          <div class="fc-hint" id="fc-hint-front">👆 Нажми, чтобы увидеть суть</div>
+        </div>
+        <div class="flashcard-face back">
+          <div class="fc-text" id="fc-text">Содержание статьи</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn ghost sm" style="flex:1" onclick="fcPrev()" id="fc-btn-prev">← Назад</button>
+      <button class="btn ghost sm" style="flex:1" onclick="fcRandom()" id="fc-btn-random">🎲 Случайная</button>
+      <button class="btn sm" style="flex:1" onclick="fcNext()" id="fc-btn-next">Далее →</button>
+    </div>
+    <div style="text-align:center; color:var(--muted); font-size:11px; margin-top:14px;">
+      <span id="fc-label-card">Карточка</span> <span id="fc-idx">1</span> / <span id="fc-total">22</span>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="card slide-in" id="lb-screen" style="display:none">
+    <div class="top-bar">
+      <h2 id="lb-title">🏆 Таблица лидеров</h2>
+      <button class="icon-btn" onclick="backToMenu()">✕</button>
+    </div>
+    <div class="tabs" id="lb-tabs">
+      <button class="tab active" data-mode="single" onclick="switchLb('single', this)" id="lb-tab-single">👤 Одиночная</button>
+      <button class="tab" data-mode="duel" onclick="switchLb('duel', this)" id="lb-tab-duel">⚔️ Дуэль</button>
+      <button class="tab" data-mode="jury" onclick="switchLb('jury', this)" id="lb-tab-jury">⚖️ Присяжные</button>
+      <button class="tab" data-mode="online" onclick="switchLb('online', this)" id="lb-tab-online">🌐 Онлайн</button>
+    </div>
+    <div id="lb-list"></div>
+    <button class="btn ghost" style="margin-top:16px" onclick="clearLeaderboard()" id="lb-clear-btn">🗑 Очистить локальную</button>
+  </div>
+
+  <!-- REFERENCE -->
+  <div class="card slide-in" id="ref-screen" style="display:none">
+    <div class="top-bar">
+      <h2 id="ref-title">📚 Справочник</h2>
+      <button class="icon-btn" onclick="backToMenu()">✕</button>
+    </div>
+    <input type="text" class="search-box" id="ref-search" placeholder="🔍 Поиск..." oninput="searchRef()">
+    <div class="tabs" id="ref-tabs">
+      <button class="tab active" data-cat="all" onclick="filterRef('all', this)" id="ref-tab-all">Все</button>
+      <button class="tab" data-cat="УК" onclick="filterRef('УК', this)" id="ref-tab-uk">УК</button>
+      <button class="tab" data-cat="КоАП" onclick="filterRef('КоАП', this)" id="ref-tab-koap">КоАП</button>
+      <button class="tab" data-cat="Конституция" onclick="filterRef('Конституция', this)" id="ref-tab-const">Конституция</button>
+    </div>
+    <div class="ref-list" id="ref-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="card slide-in" id="profile-screen" style="display:none">
+    <div class="top-bar">
+      <h2 id="prof-title">👤 Профиль</h2>
+      <button class="icon-btn" onclick="backToMenu()">✕</button>
+    </div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <h3 style="font-size:14px; margin:16px 0 10px; color:var(--accent);" id="prof-blocks-title">📊 Прогресс по блокам</h3>
+    <div id="block-stats"></div>
+    <h3 style="font-size:14px; margin:16px 0 10px; color:var(--accent);" id="prof-ach-title">🏆 Достижения</h3>
+    <div class="ach-grid" id="ach-grid"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card result-screen slide-in" id="result-screen" style="display:none">
+    <div class="big" id="result-emoji">🏆</div>
+    <h2 id="result-title">Игра завершена!</h2>
+    <p id="result-text"></p>
+    <div id="achievements"></div>
+    <div id="jury-result-block" style="display:none"></div>
+    <div id="quote-block" class="quote-block" style="display:none"></div>
+    <div id="certificate-block" style="display:none"></div>
+
+    <div id="save-score-block" style="display:none; margin-top:22px">
+      <input type="text" class="name-input" id="player-name" maxlength="16" placeholder="Введи своё имя" autocomplete="off">
+      <button class="btn gold" style="margin-top:10px" onclick="saveScore()" id="save-btn">💾 Сохранить результат</button>
+    </div>
+    <button class="btn" style="margin-top:12px" onclick="backToMenu()" id="home-btn">🏠 В главное меню</button>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= AUDIO (приятные звуки) =================
+   Используем мягкие синусоидальные тона с плавной атакой и затуханием.
+   Никаких резких скачков. Всё тихо. */
+
+const Sfx = {
+  ctx: null,
+  master: null,
+  init(){
+    if(this.ctx) return;
+    try{
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // Основной gain — общий уровень громкости всех звуков
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.5;
+      this.master.connect(this.ctx.destination);
+    }catch(e){}
+  },
+  // Мягкий тон с плавной атакой и затуханием
+  tone(freq, duration, type='sine', vol=0.15, attack=0.02, release=0.15){
+    this.init();
+    if(!this.ctx || !this.master) return;
+    const t = this.ctx.currentTime;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.value = 0;
+    o.connect(g);
+    g.connect(this.master);
+    // Плавная атака
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + attack);
+    // Плавное затухание
+    g.gain.setValueAtTime(vol, t + duration - release);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    o.start(t);
+    o.stop(t + duration + 0.05);
+  },
+  // Приятный мажорный аккорд
+  correct(){
+    this.tone(523.25, 0.35, 'sine', 0.14); // C5
+    setTimeout(() => this.tone(659.25, 0.4, 'sine', 0.12), 90);  // E5
+    setTimeout(() => this.tone(783.99, 0.5, 'sine', 0.10), 180); // G5
+  },
+  // Мягкий минорный спуск
+  wrong(){
+    this.tone(392.00, 0.4, 'sine', 0.13); // G4
+    setTimeout(() => this.tone(329.63, 0.5, 'sine', 0.10), 140); // E4
+  },
+  // Мягкий клик — как деревянная кнопка
+  click(){
+    this.tone(880, 0.08, 'sine', 0.06, 0.005, 0.04);
+  },
+  // Мягкое переливание для финала
+  finish(){
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C-E-G-C-E
+    notes.forEach((f, i) => setTimeout(() => this.tone(f, 0.45, 'sine', 0.10, 0.03, 0.25), i * 130));
+  },
+  // Достижение — восходящее арпеджио
+  achievement(){
+    const notes = [659.25, 783.99, 987.77, 1318.51]; // E-G-B-E
+    notes.forEach((f, i) => setTimeout(() => this.tone(f, 0.35, 'sine', 0.11, 0.02, 0.2), i * 90));
+  },
+  // Мягкое переключение
+  swap(){
+    this.tone(440, 0.15, 'sine', 0.08, 0.01, 0.08);
+  }
+};
+
+/* ================= ПРИЯТНАЯ ФОНОВАЯ МУЗЫКА =================
+   Спокойное арпеджио из пентатоники с плавными атаками.
+   Очень тихо, чтобы не мешать. */
+
+const Ambience = {
+  ctx: null,
+  master: null,
+  playing: false,
+  scheduler: null,
+  nextNoteTime: 0,
+  step: 0,
+  bpm: 42, // медленно
+  // Пентатоника до-мажор (до, ре, ми, соль, ля) — всегда звучит красиво
+  pattern: [
+    261.63, 329.63, 392.00, 440.00, 523.25,
+    392.00, 329.63, 261.63, 329.63, 440.00,
+    523.25, 392.00, 293.66, 261.63
+  ],
+  start(){
+    if(this.playing) return;
+    Sfx.init();
+    if(!Sfx.ctx) return;
+    this.ctx = Sfx.ctx;
+    this.master = this.ctx.createGain();
+    this.master.gain.value = 0;
+    this.master.connect(this.ctx.destination);
+    // Плавный fade-in
+    const t = this.ctx.currentTime;
+    this.master.gain.linearRampToValueAtTime(0.045, t + 3);
+    this.nextNoteTime = t + 0.2;
+    this.step = 0;
+    this.playing = true;
+    this.scheduler = setInterval(() => this.tick(), 100);
+  },
+  stop(){
+    if(!this.playing) return;
+    const t = this.ctx.currentTime;
+    try{
+      this.master.gain.cancelScheduledValues(t);
+      this.master.gain.setValueAtTime(this.master.gain.value, t);
+      this.master.gain.linearRampToValueAtTime(0, t + 1.5);
+    }catch(e){}
+    setTimeout(() => {
+      try{ this.master.disconnect(); }catch(e){}
+      clearInterval(this.scheduler);
+      this.playing = false;
+    }, 1600);
+  },
+  tick(){
+    if(!this.playing) return;
+    const now = this.ctx.currentTime;
+    while(this.nextNoteTime < now + 0.2){
+      this.playNote(this.nextNoteTime);
+      this.nextNoteTime += 60 / this.bpm / 2; // восьмые
+      this.step = (this.step + 1) % this.pattern.length;
+    }
+  },
+  playNote(time){
+    const freq = this.pattern[this.step];
+    // Тихая основная нота
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    g.gain.value = 0;
+    o.connect(g);
+    g.connect(this.master);
+    // Плавная атака и длинное затухание
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(0.25, time + 0.6);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 2.4);
+    o.start(time);
+    o.stop(time + 2.6);
+    // Тихая октава сверху с задержкой — украшение
+    if(this.step % 4 === 0){
+      const o2 = this.ctx.createOscillator();
+      const g2 = this.ctx.createGain();
+      o2.type = 'sine';
+      o2.frequency.value = freq * 2;
+      g2.gain.value = 0;
+      o2.connect(g2);
+      g2.connect(this.master);
+      g2.gain.setValueAtTime(0, time + 0.3);
+      g2.gain.linearRampToValueAtTime(0.08, time + 0.9);
+      g2.gain.exponentialRampToValueAtTime(0.001, time + 2.5);
+      o2.start(time + 0.3);
+      o2.stop(time + 2.6);
+    }
+  }
+};
+
+/* ================= I18N (полный перевод) ================= */
+const I18N = {
+  ru: {
+    // Header / menu
+    "main-title":"Правовой навигатор",
+    "subtitle-text":"Игра-тренажёр по праву для подростков · v6.1",
+    "welcome-title":"Правовой навигатор",
+    "welcome-sub":"Разбирайся в реальных правовых ситуациях. Играй один, с другом, на карте города или в суде присяжных.",
+    "hud-l1":"Прогресс", "hud-l2":"Очки", "hud-l3":"Блок",
+    "btn-single":"Одиночная", "btn-single-s":"15 уровней",
+    "btn-duel":"Дуэль", "btn-duel-s":"2 игрока",
+    "btn-map":"Карта города", "btn-map-s":"локации",
+    "btn-jury":"Присяжные", "btn-jury-s":"вердикт",
+    "btn-adv":"Адвокат", "btn-adv-s":"сюжет",
+    "btn-fc":"Флешкарты", "btn-fc-s":"тренировка",
+    "daily-btn-text":"Кейс дня", "btn-daily-s":"ежедневно",
+    "btn-lb":"Лидеры", "btn-lb-s":"топ-20",
+    "btn-ref":"Справочник статей", "btn-ref-s":"УК · КоАП · Конституция",
+    "btn-prof":"Профиль", "btn-prof-s":"статистика",
+    "btn-set":"Настройки", "btn-set-s":"тема · язык",
+    // Situation label
+    "sit-label":"СИТУАЦИЯ",
+    // Map
+    "map-title":"🗺 Правовой город",
+    "map-hint":"Нажми на локацию, чтобы открыть кейс. Локации открываются по мере прохождения.",
+    // Flashcards
+    "fc-title":"🎴 Флешкарты", "fc-hint":"Нажми на карточку, чтобы перевернуть",
+    "fc-hint-front":"👆 Нажми, чтобы увидеть суть",
+    "fc-btn-prev":"← Назад", "fc-btn-random":"🎲 Случайная", "fc-btn-next":"Далее →",
+    "fc-label-card":"Карточка",
+    // Leaderboard
+    "lb-title":"🏆 Таблица лидеров",
+    "lb-tab-single":"👤 Одиночная", "lb-tab-duel":"⚔️ Дуэль",
+    "lb-tab-jury":"⚖️ Присяжные", "lb-tab-online":"🌐 Онлайн",
+    "lb-clear-btn":"🗑 Очистить локальную",
+    "lb-empty":"Пока нет результатов.",
+    "lb-online-empty":"🌐 Онлайн-лидеры",
+    "lb-online-hint":"Для подключения настройте Firebase в разделе «Настройки». Пока используется локальный режим.",
+    // Reference
+    "ref-title":"📚 Справочник", "ref-search-ph":"🔍 Поиск: кража, 14 лет, хулиганство...",
+    "ref-tab-all":"Все", "ref-tab-uk":"УК", "ref-tab-koap":"КоАП", "ref-tab-const":"Конституция",
+    "ref-empty":"Ничего не найдено",
+    // Profile
+    "prof-title":"👤 Профиль",
+    "prof-blocks-title":"📊 Прогресс по блокам",
+    "prof-ach-title":"🏆 Достижения",
+    "stat-games":"Игр", "stat-games-sub":"всего",
+    "stat-acc":"Точность", "stat-acc-sub":"верных",
+    "stat-best":"Лучший счёт", "stat-best-sub":"из 150",
+    "stat-streak":"Серия", "stat-streak-sub":"дней",
+    "stat-duel":"Дуэли", "stat-duel-sub":"побед",
+    "stat-jury":"Присяжный", "stat-jury-sub":"идеальных",
+    "stat-adv":"Адвокат", "stat-adv-sub":"выигранных дел",
+    "stat-daily":"Ежедневки", "stat-daily-sub":"пройдено",
+    "block":"Блок",
+    // Result
+    "result-save":"💾 Сохранить результат",
+    "result-home":"🏠 В главное меню",
+    "result-name-ph":"Введи своё имя",
+    "result-next":"Далее →", "result-finish":"🏁 Завершить",
+    "result-next-episode":"Следующий эпизод →", "result-verdict":"🏛 Вынести вердикт",
+    "result-adv-next":"Следующий этап →", "result-adv-finish":"🏛 Завершить дело",
+    "result-next-round":"Следующий раунд →", "result-totals":"🏁 Итоги",
+    // Jury / Advocate
+    "modal-jury-start":"▶ Начать",
+    "modal-adv-start":"▶ Взять дело",
+    "modal-cancel":"Отмена",
+    "modal-jury-title":"⚖️ Суд присяжных",
+    "modal-adv-title":"🏛 Симулятор адвоката",
+    "modal-adv-stages":"4 этапа · стратегия защиты · финальный вердикт",
+    // Daily
+    "daily-done":"Кейс дня ✓", "daily-todo":"Кейс дня",
+    "daily-hint":"📅 Ежедневный кейс — один вопрос",
+    "daily-win-title":"Кейс дня пройден!",
+    "daily-lose-title":"Кейс дня",
+    "daily-win-text":"Отличная работа! Возвращайся завтра.",
+    "daily-lose-text":"Не беда — прочитай пояснение и попробуй завтра.",
+    // Duel
+    "duel-p1":"🔵 Игрок 1", "duel-p2":"🟣 Игрок 2",
+    "duel-turn":"Ход", "duel-turn-1":"Ход Игрока 1", "duel-turn-2":"Ход Игрока 2",
+    "duel-hint-1":"🔵 Игрок 1, выбери ответ. Игрок 2 — не подглядывай!",
+    "duel-hint-2":"🟣 Игрок 1 выбрал. Теперь ход Игрока 2!",
+    "duel-p1-answered":"🔵 Игрок 1 ответил! Передайте устройство Игроку 2.",
+    "duel-round-result":"Результат раунда:",
+    "duel-winner-1":"🔵 Победил Игрок 1!",
+    "duel-winner-2":"🟣 Победил Игрок 2!",
+    "duel-draw":"🤝 Ничья!",
+    "duel-name-ph":"Имя победителя",
+    // Settings
+    "settings-title":"⚙️ Настройки",
+    "settings-theme":"🎨 Тема:",
+    "settings-theme-dark":"🌑 Тёмная", "settings-theme-light":"☀️ Светлая", "settings-theme-sepia":"📜 Сепия",
+    "settings-lang":"🌍 Язык:",
+    "settings-lang-ru":"🇷🇺 Русский", "settings-lang-en":"🇬🇧 English",
+    "settings-shuffle":"🔀 Перемешивать варианты ответов:",
+    "settings-yes":"Да", "settings-no":"Нет",
+    "settings-music":"🎵 Фоновая музыка:",
+    "settings-on":"Вкл", "settings-off":"Выкл",
+    "settings-export":"💾 Экспорт данных:",
+    "settings-copy":"📋 Копировать",
+    "settings-import":"📥 Импорт (JSON):",
+    "settings-close":"Закрыть", "settings-import-btn":"Импорт",
+    "settings-reset":"🗑 Полный сброс",
+    "settings-reset-confirm":"Удалить ВСЕ данные?",
+    "toast-copied":"📋 Скопировано",
+    "toast-imported":"✅ Импортировано",
+    "toast-import-error":"⚠️ Ошибка JSON",
+    "toast-empty":"⚠️ Пусто",
+    "toast-reset":"🗑 Сброшено",
+    // Certificate
+    "cert-title":"СЕРТИФИКАТ",
+    "cert-sub":"Знаток правовых основ",
+    "cert-desc":"Награждается за прохождение «Правового навигатора» с идеальным результатом 100%.",
+    "cert-btn":"🖨 Сохранить сертификат",
+    "cert-player":"Игрок",
+    // Misc
+    "yes":"Да", "no":"Нет",
+    "next":"Далее →"
+  },
+  en: {
+    "main-title":"Legal Navigator",
+    "subtitle-text":"Legal education game for teens · v6.1",
+    "welcome-title":"Legal Navigator",
+    "welcome-sub":"Understand real legal situations. Play alone, with a friend, on the city map, or in jury trial.",
+    "hud-l1":"Progress", "hud-l2":"Score", "hud-l3":"Block",
+    "btn-single":"Single", "btn-single-s":"15 levels",
+    "btn-duel":"Duel", "btn-duel-s":"2 players",
+    "btn-map":"City Map", "btn-map-s":"locations",
+    "btn-jury":"Jury", "btn-jury-s":"verdict",
+    "btn-adv":"Advocate", "btn-adv-s":"story mode",
+    "btn-fc":"Flashcards", "btn-fc-s":"practice",
+    "daily-btn-text":"Daily Case", "btn-daily-s":"daily",
+    "btn-lb":"Leaders", "btn-lb-s":"top-20",
+    "btn-ref":"Reference", "btn-ref-s":"Criminal · Admin · Constitution",
+    "btn-prof":"Profile", "btn-prof-s":"stats",
+    "btn-set":"Settings", "btn-set-s":"theme · language",
+    "sit-label":"SITUATION",
+    "map-title":"🗺 Legal City",
+    "map-hint":"Tap a location to open a case. Locations unlock as you progress.",
+    "fc-title":"🎴 Flashcards", "fc-hint":"Tap the card to flip it",
+    "fc-hint-front":"👆 Tap to see the essence",
+    "fc-btn-prev":"← Back", "fc-btn-random":"🎲 Random", "fc-btn-next":"Next →",
+    "fc-label-card":"Card",
+    "lb-title":"🏆 Leaderboard",
+    "lb-tab-single":"👤 Single", "lb-tab-duel":"⚔️ Duel",
+    "lb-tab-jury":"⚖️ Jury", "lb-tab-online":"🌐 Online",
+    "lb-clear-btn":"🗑 Clear local",
+    "lb-empty":"No results yet.",
+    "lb-online-empty":"🌐 Online leaders",
+    "lb-online-hint":"Configure Firebase in Settings to enable. Local mode is used for now.",
+    "ref-title":"📚 Reference", "ref-search-ph":"🔍 Search: theft, 14 years, hooliganism...",
+    "ref-tab-all":"All", "ref-tab-uk":"Criminal", "ref-tab-koap":"Admin", "ref-tab-const":"Constitution",
+    "ref-empty":"Nothing found",
+    "prof-title":"👤 Profile",
+    "prof-blocks-title":"📊 Progress by blocks",
+    "prof-ach-title":"🏆 Achievements",
+    "stat-games":"Games", "stat-games-sub":"total",
+    "stat-acc":"Accuracy", "stat-acc-sub":"correct",
+    "stat-best":"Best score", "stat-best-sub":"out of 150",
+    "stat-streak":"Streak", "stat-streak-sub":"days",
+    "stat-duel":"Duels", "stat-duel-sub":"wins",
+    "stat-jury":"Juror", "stat-jury-sub":"perfect",
+    "stat-adv":"Advocate", "stat-adv-sub":"cases won",
+    "stat-daily":"Daily", "stat-daily-sub":"completed",
+    "block":"Block",
+    "result-save":"💾 Save result",
+    "result-home":"🏠 Main menu",
+    "result-name-ph":"Enter your name",
+    "result-next":"Next →", "result-finish":"🏁 Finish",
+    "result-next-episode":"Next episode →", "result-verdict":"🏛 Deliver verdict",
+    "result-adv-next":"Next stage →", "result-adv-finish":"🏛 Close case",
+    "result-next-round":"Next round →", "result-totals":"🏁 Totals",
+    "modal-jury-start":"▶ Start",
+    "modal-adv-start":"▶ Take case",
+    "modal-cancel":"Cancel",
+    "modal-jury-title":"⚖️ Jury Trial",
+    "modal-adv-title":"🏛 Advocate Simulator",
+    "modal-adv-stages":"4 stages · defense strategy · final verdict",
+    "daily-done":"Daily ✓", "daily-todo":"Daily Case",
+    "daily-hint":"📅 Daily case — one question",
+    "daily-win-title":"Daily case completed!",
+    "daily-lose-title":"Daily Case",
+    "daily-win-text":"Great job! Come back tomorrow.",
+    "daily-lose-text":"No worries — read the explanation and try tomorrow.",
+    "duel-p1":"🔵 Player 1", "duel-p2":"🟣 Player 2",
+    "duel-turn":"Turn", "duel-turn-1":"Player 1's turn", "duel-turn-2":"Player 2's turn",
+    "duel-hint-1":"🔵 Player 1, choose your answer. Player 2 — no peeking!",
+    "duel-hint-2":"🟣 Player 1 chose. Now Player 2's turn!",
+    "duel-p1-answered":"🔵 Player 1 answered! Pass the device to Player 2.",
+    "duel-round-result":"Round result:",
+    "duel-winner-1":"🔵 Player 1 wins!",
+    "duel-winner-2":"🟣 Player 2 wins!",
+    "duel-draw":"🤝 Draw!",
+    "duel-name-ph":"Winner's name",
+    "settings-title":"⚙️ Settings",
+    "settings-theme":"🎨 Theme:",
+    "settings-theme-dark":"🌑 Dark", "settings-theme-light":"☀️ Light", "settings-theme-sepia":"📜 Sepia",
+    "settings-lang":"🌍 Language:",
+    "settings-lang-ru":"🇷🇺 Russian", "settings-lang-en":"🇬🇧 English",
+    "settings-shuffle":"🔀 Shuffle answer options:",
+    "settings-yes":"Yes", "settings-no":"No",
+    "settings-music":"🎵 Background music:",
+    "settings-on":"On", "settings-off":"Off",
+    "settings-export":"💾 Export data:",
+    "settings-copy":"📋 Copy",
+    "settings-import":"📥 Import (JSON):",
+    "settings-close":"Close", "settings-import-btn":"Import",
+    "settings-reset":"🗑 Full reset",
+    "settings-reset-confirm":"Delete ALL data?",
+    "toast-copied":"📋 Copied",
+    "toast-imported":"✅ Imported",
+    "toast-import-error":"⚠️ JSON error",
+    "toast-empty":"⚠️ Empty",
+    "toast-reset":"🗑 Reset complete",
+    "cert-title":"CERTIFICATE",
+    "cert-sub":"Legal Foundations Expert",
+    "cert-desc":"Awarded for completing Legal Navigator with a perfect 100% result.",
+    "cert-btn":"🖨 Save certificate",
+    "cert-player":"Player",
+    "yes":"Yes", "no":"No",
+    "next":"Next →"
+  }
+};
+
+let LANG = 'ru';
+function t(key){
+  return (I18N[LANG] && I18N[LANG][key]) || (I18N.ru[key] || key);
+}
+function applyLang(){
+  // Header
+  document.getElementById('main-title').textContent = t('main-title');
+  document.getElementById('subtitle-text').textContent = t('subtitle-text');
+  document.getElementById('welcome-title').textContent = t('welcome-title');
+  document.getElementById('welcome-sub').textContent = t('welcome-sub');
+  // HUD labels
+  document.getElementById('hud-l1').textContent = t('hud-l1');
+  document.getElementById('hud-l2').textContent = t('hud-l2');
+  document.getElementById('hud-l3').textContent = t('hud-l3');
+  // Menu
+  setBtnText('btn-single', 'btn-single-s', 'btn-single', 'btn-single-s');
+  setBtnText('btn-duel', 'btn-duel-s', 'btn-duel', 'btn-duel-s');
+  setBtnText('btn-map', 'btn-map-s', 'btn-map', 'btn-map-s');
+  setBtnText('btn-jury', 'btn-jury-s', 'btn-jury', 'btn-jury-s');
+  setBtnText('btn-adv', 'btn-adv-s', 'btn-adv', 'btn-adv-s');
+  setBtnText('btn-fc', 'btn-fc-s', 'btn-fc', 'btn-fc-s');
+  setBtnText('btn-daily', 'btn-daily-s', 'daily-btn-text', 'btn-daily-s');
+  setBtnText('btn-lb', 'btn-lb-s', 'btn-lb', 'btn-lb-s');
+  setBtnText('btn-ref', 'btn-ref-s', 'btn-ref', 'btn-ref-s');
+  setBtnText('btn-prof', 'btn-prof-s', 'btn-prof', 'btn-prof-s');
+  setBtnText('btn-set', 'btn-set-s', 'btn-set', 'btn-set-s');
+  // Situation label
+  document.getElementById('situation').setAttribute('data-label', t('sit-label'));
+  // Map
+  document.getElementById('map-title').textContent = t('map-title');
+  document.getElementById('map-hint').textContent = t('map-hint');
+  // Flashcards
+  document.getElementById('fc-title').textContent = t('fc-title');
+  document.getElementById('fc-hint').textContent = t('fc-hint');
+  document.getElementById('fc-hint-front').textContent = t('fc-hint-front');
+  document.getElementById('fc-btn-prev').textContent = t('fc-btn-prev');
+  document.getElementById('fc-btn-random').textContent = t('fc-btn-random');
+  document.getElementById('fc-btn-next').textContent = t('fc-btn-next');
+  document.getElementById('fc-label-card').textContent = t('fc-label-card');
+  // Leaderboard
+  document.getElementById('lb-title').textContent = t('lb-title');
+  document.getElementById('lb-tab-single').textContent = t('lb-tab-single');
+  document.getElementById('lb-tab-duel').textContent = t('lb-tab-duel');
+  document.getElementById('lb-tab-jury').textContent = t('lb-tab-jury');
+  document.getElementById('lb-tab-online').textContent = t('lb-tab-online');
+  document.getElementById('lb-clear-btn').textContent = t('lb-clear-btn');
+  // Reference
+  document.getElementById('ref-title').textContent = t('ref-title');
+  document.getElementById('ref-search').placeholder = t('ref-search-ph');
+  document.getElementById('ref-tab-all').textContent = t('ref-tab-all');
+  document.getElementById('ref-tab-uk').textContent = t('ref-tab-uk');
+  document.getElementById('ref-tab-koap').textContent = t('ref-tab-koap');
+  document.getElementById('ref-tab-const').textContent = t('ref-tab-const');
+  // Profile
+  document.getElementById('prof-title').textContent = t('prof-title');
+  document.getElementById('prof-blocks-title').textContent = t('prof-blocks-title');
+  document.getElementById('prof-ach-title').textContent = t('prof-ach-title');
+  // Result
+  document.getElementById('save-btn').textContent = t('result-save');
+  document.getElementById('home-btn').textContent = t('result-home');
+  document.getElementById('player-name').placeholder = t('result-name-ph');
+  // Duel labels
+  document.getElementById('duel-p1-label').textContent = t('duel-p1');
+  document.getElementById('duel-p2-label').textContent = t('duel-p2');
+  // Character names
+  if(typeof CHARACTERS !== 'undefined'){
+    Object.keys(CHARACTERS).forEach(k => {
+      if(CHARACTERS[k].i18nKey){
+        CHARACTERS[k].name = t(CHARACTERS[k].i18nKey);
+      }
+    });
+  }
+  // Re-render current screen if it's profile or lb
+  if(document.getElementById('profile-screen').style.display === 'block') renderProfile();
+  if(document.getElementById('lb-screen').style.display === 'block') renderLeaderboard();
+  if(document.getElementById('ref-screen').style.display === 'block') searchRef();
+  if(document.getElementById('map-screen').style.display === 'block') renderMap();
+  // Daily button state
+  updateDailyBtn();
+}
+function setBtnText(btnId, subId, mainKey, subKey){
+  const b = document.getElementById(btnId);
+  if(!b) return;
+  const span = b.querySelector('span');
+  const small = b.querySelector('small');
+  if(span) span.textContent = t(mainKey);
+  if(small) small.textContent = t(subKey);
+}
+
+/* ================= REFERENCE ================= */
+const REFERENCE = [
+  {cat:"УК", code:"ст. 20 УК РФ", codeEn:"Art. 20 Crim. Code", name:"Возраст уголовной ответственности", nameEn:"Age of criminal responsibility", text:"Общий возраст — 16 лет. За тяжкие преступления — с 14 лет.", textEn:"General age — 16 years. For serious crimes — from 14 years."},
+  {cat:"УК", code:"ст. 88 УК РФ", codeEn:"Art. 88 Crim. Code", name:"Наказания для несовершеннолетних", nameEn:"Juvenile penalties", text:"Штраф, обязательные работы, исправительные работы, ограничение свободы, лишение свободы (макс. 10 лет).", textEn:"Fine, community service, corrective labor, restriction of freedom, imprisonment (max 10 years)."},
+  {cat:"УК", code:"ст. 90 УК РФ", codeEn:"Art. 90 Crim. Code", name:"Принудительные меры воспитания", nameEn:"Compulsory educational measures", text:"Предупреждение, передача под надзор, обязанность загладить вред, ограничение досуга.", textEn:"Warning, supervision, obligation to make amends, leisure restriction."},
+  {cat:"УК", code:"ст. 105 УК РФ", codeEn:"Art. 105 Crim. Code", name:"Убийство", nameEn:"Murder", text:"Ответственность с 14 лет. Особо тяжкое.", textEn:"Liability from 14. Especially serious."},
+  {cat:"УК", code:"ст. 111 УК РФ", codeEn:"Art. 111 Crim. Code", name:"Тяжкий вред здоровью", nameEn:"Grievous bodily harm", text:"С 14 лет.", textEn:"From 14."},
+  {cat:"УК", code:"ст. 112 УК РФ", codeEn:"Art. 112 Crim. Code", name:"Средний вред здоровью", nameEn:"Moderate bodily harm", text:"С 16 лет.", textEn:"From 16."},
+  {cat:"УК", code:"ст. 119 УК РФ", codeEn:"Art. 119 Crim. Code", name:"Угроза убийством", nameEn:"Death threat", text:"С 16 лет, если угроза реальна.", textEn:"From 16, if threat is real."},
+  {cat:"УК", code:"ст. 158 УК РФ", codeEn:"Art. 158 Crim. Code", name:"Кража", nameEn:"Theft", text:"Тайное хищение. С 14 лет.", textEn:"Secret embezzlement. From 14."},
+  {cat:"УК", code:"ст. 161 УК РФ", codeEn:"Art. 161 Crim. Code", name:"Грабёж", nameEn:"Robbery", text:"Открытое хищение. С 14 лет.", textEn:"Open embezzlement. From 14."},
+  {cat:"УК", code:"ст. 162 УК РФ", codeEn:"Art. 162 Crim. Code", name:"Разбой", nameEn:"Armed robbery", text:"Нападение с насилием. С 14 лет.", textEn:"Assault with violence. From 14."},
+  {cat:"УК", code:"ст. 166 УК РФ", codeEn:"Art. 166 Crim. Code", name:"Угон", nameEn:"Car theft", text:"Завладение авто без цели кражи. С 14 лет.", textEn:"Taking a car without intent to steal. From 14."},
+  {cat:"УК", code:"ст. 167 УК РФ", codeEn:"Art. 167 Crim. Code", name:"Уничтожение имущества", nameEn:"Property destruction", text:"С 16 лет; при отягчающих — с 14.", textEn:"From 16; aggravated — from 14."},
+  {cat:"УК", code:"ст. 207 УК РФ", codeEn:"Art. 207 Crim. Code", name:"Ложное сообщение о терроризме", nameEn:"False terrorism report", text:"С 14 лет. Даже «шутка» — преступление.", textEn:"From 14. Even a joke is a crime."},
+  {cat:"УК", code:"ст. 213 УК РФ", codeEn:"Art. 213 Crim. Code", name:"Хулиганство", nameEn:"Hooliganism", text:"С 16 лет; при отягчающих — с 14.", textEn:"From 16; aggravated — from 14."},
+  {cat:"УК", code:"ст. 264 УК РФ", codeEn:"Art. 264 Crim. Code", name:"Нарушение ПДД с вредом", nameEn:"Traffic violation with harm", text:"С 16 лет.", textEn:"From 16."},
+  {cat:"КоАП", code:"ст. 2.3 КоАП РФ", codeEn:"Art. 2.3 Admin. Code", name:"Возраст адм. ответственности", nameEn:"Age of admin. liability", text:"С 16 лет. До 16 — отвечают родители.", textEn:"From 16. Under 16 — parents are liable."},
+  {cat:"КоАП", code:"ст. 6.1.1 КоАП РФ", codeEn:"Art. 6.1.1 Admin. Code", name:"Побои", nameEn:"Battery", text:"Административная ответственность.", textEn:"Administrative liability."},
+  {cat:"КоАП", code:"ст. 12.29 КоАП РФ", codeEn:"Art. 12.29 Admin. Code", name:"Нарушение ПДД пешеходом", nameEn:"Pedestrian traffic violation", text:"С 16 лет.", textEn:"From 16."},
+  {cat:"КоАП", code:"ст. 20.20 КоАП РФ", codeEn:"Art. 20.20 Admin. Code", name:"Распитие в общественном месте", nameEn:"Public drinking", text:"Штраф. До 16 — на родителей.", textEn:"Fine. Under 16 — on parents."},
+  {cat:"КоАП", code:"ст. 5.61 КоАП РФ", codeEn:"Art. 5.61 Admin. Code", name:"Оскорбление", nameEn:"Insult", text:"Административная ответственность.", textEn:"Administrative liability."},
+  {cat:"Конституция", code:"ст. 51 Конституции РФ", codeEn:"Art. 51 Constitution", name:"Не свидетельствовать против себя", nameEn:"Right against self-incrimination", text:"Право не свидетельствовать против себя, супруга и близких.", textEn:"Right not to testify against self, spouse, or close relatives."},
+  {cat:"Конституция", code:"ст. 49 Конституции РФ", codeEn:"Art. 49 Constitution", name:"Презумпция невиновности", nameEn:"Presumption of innocence", text:"Обвиняемый не обязан доказывать невиновность.", textEn:"The accused is not obliged to prove innocence."}
+];
+
+/* ================= QUOTES ================= */
+const QUOTES = [
+  {text:"Никто не может быть подвергнут уголовному наказанию иначе как по приговору суда.", textEn:"No one may be subjected to criminal punishment except by a court verdict.", author:"Принцип правосудия", authorEn:"Principle of justice"},
+  {text:"Незнание закона не освобождает от ответственности.", textEn:"Ignorance of the law does not excuse from responsibility.", author:"Латинская формула", authorEn:"Latin maxim"},
+  {text:"Право — это искусство добра и справедливости.", textEn:"Law is the art of goodness and justice.", author:"Цельс", authorEn:"Celsus"},
+  {text:"Свобода одного человека заканчивается там, где начинается свобода другого.", textEn:"The freedom of one ends where the freedom of another begins.", author:"Виктор Гюго", authorEn:"Victor Hugo"},
+  {text:"Закон суров, но это закон.", textEn:"The law is harsh, but it is the law.", author:"Dura lex, sed lex", authorEn:"Dura lex, sed lex"},
+  {text:"Судебный процесс — это поиск истины, а не борьба сторон.", textEn:"A trial is a search for truth, not a battle of parties.", author:"Правовая традиция", authorEn:"Legal tradition"}
+];
+
+/* ================= CHARACTERS ================= */
+const CHARACTERS = {
+  advocate: {name:"Адвокат Виктор Петрович", nameEn:"Advocate Viktor Petrovich", i18nKey:"char-advocate",
+    avatar:"👨‍⚖️", lines:[
+    "Внимание к деталям — залог успешной защиты.",
+    "Прочитай ситуацию медленно и выдели ключевые факты.",
+    "Помни: даже «шутка» может быть преступлением.",
+    "Возраст подзащитного — критически важный фактор.",
+    "Ищи статью, которая точно описывает деяние."
+  ], linesEn:[
+    "Attention to detail is the key to a successful defense.",
+    "Read the situation slowly and highlight key facts.",
+    "Remember: even a joke can be a crime.",
+    "The age of the defendant is critical.",
+    "Look for the article that precisely describes the act."
+  ]},
+  inspector: {name:"Инспектор ПДН Марина Сергеевна", nameEn:"Inspector Marina Sergeevna", i18nKey:"char-inspector",
+    avatar:"👮‍♀️", lines:[
+    "Профилактика важнее наказания — но закон есть закон.",
+    "Ребёнок до 16 отвечает через родителей. Это важно.",
+    "Постановка на учёт — это не клеймо, а шанс.",
+    "Уважай права подростка — это закон.",
+    "Помни о ст. 51 Конституции."
+  ], linesEn:[
+    "Prevention matters more than punishment — but the law is the law.",
+    "Under 16, the child answers through parents. This is important.",
+    "Registration is not a stigma — it's a chance.",
+    "Respect the teen's rights — it's the law.",
+    "Remember Art. 51 of the Constitution."
+  ]},
+  judge: {name:"Судья Анна Львовна", nameEn:"Judge Anna Lvovna", i18nKey:"char-judge",
+    avatar:"👩‍⚖️", lines:[
+    "Правосудие — это взвешенность, а не скорость.",
+    "Несовершеннолетним приоритет — воспитание, не изоляция.",
+    "Пожизненное и смертная казнь к подросткам не применяются.",
+    "Изучи материалы дела, прежде чем решать.",
+    "Сомнения трактуются в пользу подсудимого."
+  ], linesEn:[
+    "Justice is about balance, not speed.",
+    "For minors, education takes priority over isolation.",
+    "Life imprisonment and death penalty do not apply to teens.",
+    "Study the case materials before deciding.",
+    "Doubts are interpreted in favor of the defendant."
+  ]}
+};
+
+// i18n keys для персонажей — переведём при applyLang
+I18N.ru["char-advocate"] = "Адвокат Виктор Петрович";
+I18N.en["char-advocate"] = "Advocate Viktor Petrovich";
+I18N.ru["char-inspector"] = "Инспектор Марина Сергеевна";
+I18N.en["char-inspector"] = "Inspector Marina Sergeevna";
+I18N.ru["char-judge"] = "Судья Анна Львовна";
+I18N.en["char-judge"] = "Judge Anna Lvovna";
+
+function getCharacterForBlock(block){
+  if(block.includes("1") || block.includes("Админ")) return CHARACTERS.inspector;
+  if(block.includes("4") || block.includes("суд")) return CHARACTERS.judge;
+  return CHARACTERS.advocate;
+}
+function getRandomLine(character){
+  const arr = (LANG === 'en' && character.linesEn) ? character.linesEn : character.lines;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* ================= LEVELS ================= */
+const LEVELS = [
+  {block:"Блок 1 · Административные проступки", blockEn:"Block 1 · Administrative offenses", title:"Шумная вечеринка", titleEn:"Noisy party", location:"school", icon:"🏫",
+    situation:"16-летний подросток устроил вечеринку с громкой музыкой после 23:00. Соседи вызвали полицию.",
+    situationEn:"A 16-year-old threw a loud party after 11 PM. Neighbors called the police.",
+    question:"Что грозит нарушителю?", questionEn:"What is the penalty?",
+    options:["Уголовная ответственность по ст. 213 УК РФ.","Ничего, это личное дело семьи.","Предупреждение или штраф по региональному закону о тишине."],
+    optionsEn:["Criminal liability under Art. 213.","Nothing, it's a private family matter.","Warning or fine under the regional noise law."],
+    correct:2, feedback:"Это административное правонарушение. Штраф на родителей.",
+    feedbackEn:"This is an administrative offense. Fine on parents.", ref:"Региональные законы + ст. 2.3 КоАП РФ", refEn:"Regional laws + Art. 2.3 Admin. Code"},
+
+  {block:"Блок 1 · Административные проступки", blockEn:"Block 1 · Administrative offenses", title:"Переход в неположенном месте", titleEn:"Jaywalking", location:"street", icon:"🚦",
+    situation:"15-летний школьник перебежал дорогу на красный свет, создав аварийную ситуацию.",
+    situationEn:"A 15-year-old ran across the road on red, causing a dangerous situation.",
+    question:"С какого возраста наступает ответственность?", questionEn:"From what age does liability apply?",
+    options:["С 16 лет.","С 14 лет.","С 18 лет."],
+    optionsEn:["From 16.","From 14.","From 18."],
+    correct:0, feedback:"Административная ответственность с 16 лет.",
+    feedbackEn:"Administrative liability from 16.", ref:"ст. 12.29, ст. 2.3 КоАП РФ", refEn:"Art. 12.29, 2.3 Admin. Code"},
+
+  {block:"Блок 1 · Административные проступки", blockEn:"Block 1 · Administrative offenses", title:"Пиво в парке", titleEn:"Beer in the park", location:"park", icon:"🌳",
+    situation:"Компания 17-летних распивает алкоголь на детской площадке.",
+    situationEn:"A group of 17-year-olds is drinking alcohol on a playground.",
+    question:"Что им грозит?", questionEn:"What awaits them?",
+    options:["Ничего, они просто отдыхают.","Административный штраф + постановка на учёт в ПДН.","Лишение свободы на 1 год."],
+    optionsEn:["Nothing, they're just relaxing.","Administrative fine + registration with juvenile services.","Imprisonment for 1 year."],
+    correct:1, feedback:"Распитие алкоголя в общественном месте — административка.",
+    feedbackEn:"Public drinking is an administrative offense.", ref:"ст. 20.20 КоАП РФ", refEn:"Art. 20.20 Admin. Code"},
+
+  {block:"Блок 2 · Уголовная ответственность с 14 лет", blockEn:"Block 2 · Criminal liability from 14", title:"Телефон одноклассника", titleEn:"Classmate's phone", location:"school", icon:"🏫",
+    situation:"14-летний выхватил телефон из рук одноклассника и убежал.",
+    situationEn:"A 14-year-old snatched a phone from a classmate and ran off.",
+    question:"Как квалифицировать деяние?", questionEn:"How to qualify the act?",
+    options:["Шутка, состава нет.","Кража — ст. 158 УК РФ.","Грабёж — ст. 161 УК РФ."],
+    optionsEn:["A joke, no offense.","Theft — Art. 158 Crim. Code.","Robbery — Art. 161 Crim. Code."],
+    correct:2, feedback:"Это грабёж — открытое хищение. С 14 лет.",
+    feedbackEn:"This is robbery — open embezzlement. From 14.", ref:"ст. 161 УК РФ, ст. 20 УК РФ", refEn:"Art. 161, 20 Crim. Code"},
+
+  {block:"Блок 2 · Уголовная ответственность с 14 лет", blockEn:"Block 2 · Criminal liability from 14", title:"Разбитая машина", titleEn:"Broken car", location:"street", icon:"🚗",
+    situation:"15-летний в отместку разбил фары соседу. Ущерб — 50 000 ₽.",
+    situationEn:"A 15-year-old broke a neighbor's headlights out of revenge. Damage — 50,000 ₽.",
+    question:"Что ему грозит?", questionEn:"What awaits him?",
+    options:["Уголовная (ст. 167/213) + гражданский иск.","Только разговор с родителями.","Пожизненное лишение свободы."],
+    optionsEn:["Criminal (Art. 167/213) + civil claim.","Just a talk with parents.","Life imprisonment."],
+    correct:0, feedback:"Ст. 167 УК — с 16 лет. При хулиганском мотиве — ст. 213, с 14 лет.",
+    feedbackEn:"Art. 167 — from 16. With hooligan motive — Art. 213, from 14.", ref:"ст. 167, 213 УК РФ", refEn:"Art. 167, 213 Crim. Code"},
+
+  {block:"Блок 2 · Уголовная ответственность с 14 лет", blockEn:"Block 2 · Criminal liability from 14", title:"Угроза в сети", titleEn:"Online threat", location:"home", icon:"📱",
+    situation:"14-летний написал однокласснице сообщения с угрозами расправы.",
+    situationEn:"A 14-year-old sent a classmate threatening messages.",
+    question:"Это преступление?", questionEn:"Is this a crime?",
+    options:["Нет, это просто переписка.","Да, если угроза реальна — ст. 119 УК.","Да, это всегда терроризм."],
+    optionsEn:["No, just a chat.","Yes, if the threat is real — Art. 119.","Yes, this is always terrorism."],
+    correct:1, feedback:"Реальная угроза — ст. 119 УК. Плюс ст. 5.61 КоАП.",
+    feedbackEn:"Real threat — Art. 119. Plus Art. 5.61 Admin. Code.", ref:"ст. 119 УК РФ", refEn:"Art. 119 Crim. Code"},
+
+  {block:"Блок 3 · Ситуации с подвохом", blockEn:"Block 3 · Tricky situations", title:"Нашёл и присвоил", titleEn:"Found and kept", location:"park", icon:"🌳",
+    situation:"16-летний нашёл на лавочке телефон и забрал себе. Владелец вернулся и увидел это.",
+    situationEn:"A 16-year-old found a phone on a bench and kept it. The owner returned and saw this.",
+    question:"Это кража или находка?", questionEn:"Theft or find?",
+    options:["Это находка — можно оставить.","Если владельца можно установить — это кража (ст. 158 УК).","Это грабёж."],
+    optionsEn:["It's a find — can keep.","If the owner can be identified — it's theft (Art. 158).","It's robbery."],
+    correct:1, feedback:"Ключевое — умысел на хищение.",
+    feedbackEn:"The key is intent to embezzle.", ref:"ст. 158 УК РФ, ст. 227 ГК РФ", refEn:"Art. 158 Crim. Code, Art. 227 Civil Code"},
+
+  {block:"Блок 3 · Ситуации с подвохом", blockEn:"Block 3 · Tricky situations", title:"Драка после школы", titleEn:"After-school fight", location:"school", icon:"🏫",
+    situation:"Двое 15-летних подрались. Один сломал другому нос.",
+    situationEn:"Two 15-year-olds fought. One broke the other's nose.",
+    question:"Что грозит?", questionEn:"What awaits?",
+    options:["Смертная казнь.","Ничего, обычная драка.","Лёгкий — КоАП. Средний/тяжкий — УК + моральный вред."],
+    optionsEn:["Death penalty.","Nothing, just a fight.","Minor — Admin. Moderate/serious — Crim. + moral damages."],
+    correct:2, feedback:"Лёгкий — ст. 6.1.1 КоАП. Средний — ст. 112 УК (с 16). Тяжкий — ст. 111 УК (с 14).",
+    feedbackEn:"Minor — Art. 6.1.1 Admin. Moderate — Art. 112 Crim. (from 16). Serious — Art. 111 (from 14).", ref:"ст. 6.1.1 КоАП, ст. 111, 112 УК", refEn:"Art. 6.1.1 Admin., Art. 111, 112 Crim."},
+
+  {block:"Блок 3 · Ситуации с подвохом", blockEn:"Block 3 · Tricky situations", title:"Ложный звонок", titleEn:"False call", location:"school", icon:"☎️",
+    situation:"14-летний со скуки позвонил в школу и сообщил о «бомбе».",
+    situationEn:"A 14-year-old, out of boredom, called the school and reported a bomb.",
+    question:"Это шутка или преступление?", questionEn:"A joke or a crime?",
+    options:["Преступление — ст. 207 УК. С 14 лет.","Шутка, ничего не будет.","Штраф 500 ₽."],
+    optionsEn:["Crime — Art. 207. From 14.","A joke, nothing will happen.","Fine 500 ₽."],
+    correct:0, feedback:"Даже «шутка» — серьёзное преступление.",
+    feedbackEn:"Even a joke is a serious crime.", ref:"ст. 207 УК РФ", refEn:"Art. 207 Crim. Code"},
+
+  {block:"Блок 4 · Симулятор суда", blockEn:"Block 4 · Court simulator", title:"Выбор наказания", titleEn:"Choosing a sentence", location:"court", icon:"🏛",
+    situation:"15-летний совершил кражу в магазине на 3000 ₽. Ранее не судим.",
+    situationEn:"A 15-year-old stole from a store, 3,000 ₽. No prior record.",
+    question:"Наиболее вероятное решение суда?", questionEn:"Most likely court decision?",
+    options:["Лишение свободы на 2 года.","Пожизненное.","Условное / обязательные работы / примирение."],
+    optionsEn:["Imprisonment for 2 years.","Life imprisonment.","Suspended / community service / reconciliation."],
+    correct:2, feedback:"Приоритет — воспитательные меры.",
+    feedbackEn:"Priority — educational measures.", ref:"ст. 88, 90, 91 УК РФ", refEn:"Art. 88, 90, 91 Crim. Code"},
+
+  {block:"Блок 4 · Симулятор суда", blockEn:"Block 4 · Court simulator", title:"Права при задержании", titleEn:"Rights upon detention", location:"police", icon:"🚔",
+    situation:"14-летнего задержали по подозрению в краже. Допрашивают без родителей.",
+    situationEn:"A 14-year-old is detained on suspicion of theft. Interrogated without parents.",
+    question:"Нарушены ли его права?", questionEn:"Are his rights violated?",
+    options:["Да. Нужен педагог/законный представитель и защитник.","Нет, всё законно.","Да, его должны отпустить."],
+    optionsEn:["Yes. Need a teacher/legal representative and lawyer.","No, everything is legal.","Yes, he should be released."],
+    correct:0, feedback:"По ст. 425 УПК обязателен педагог или законный представитель.",
+    feedbackEn:"Under Art. 425 CPC, a teacher or legal representative is required.", ref:"ст. 425 УПК, ст. 51 Конституции", refEn:"Art. 425 CPC, Art. 51 Constitution"},
+
+  {block:"Блок 5 · Правовой детектив", blockEn:"Block 5 · Legal detective", title:"Цепочка событий", titleEn:"Chain of events", location:"street", icon:"🚗",
+    situation:"16-летний украл ключи от машины, покатался и сбил пешехода.",
+    situationEn:"A 16-year-old stole car keys, took a ride, and hit a pedestrian.",
+    question:"Какие статьи применимы?", questionEn:"Which articles apply?",
+    options:["Только угон.","Угон (ст. 166) + нарушение ПДД (ст. 264). Совокупность.","Ничего, он же не хотел."],
+    optionsEn:["Only car theft.","Car theft (Art. 166) + traffic violation (Art. 264). Cumulative.","Nothing, he didn't mean to."],
+    correct:1, feedback:"Угон — с 14. Нарушение ПДД — с 16. По совокупности.",
+    feedbackEn:"Car theft — from 14. Traffic violation — from 16. Cumulative.", ref:"ст. 166, 264 УК РФ", refEn:"Art. 166, 264 Crim. Code"},
+
+  {block:"Блок 5 · Правовой детектив", blockEn:"Block 5 · Legal detective", title:"Соучастие", titleEn:"Complicity", location:"mall", icon:"🏬",
+    situation:"15-летний стоял «на шухере», пока 17-летний друг крал товары.",
+    situationEn:"A 15-year-old kept watch while his 17-year-old friend stole goods.",
+    question:"Отвечает ли 15-летний?", questionEn:"Is the 15-year-old liable?",
+    options:["Нет, он не крал.","Да, только как свидетель.","Да, как пособник — по той же статье, что исполнитель."],
+    optionsEn:["No, he didn't steal.","Yes, only as a witness.","Yes, as an accomplice — under the same article as the perpetrator."],
+    correct:2, feedback:"Пособник отвечает по той же статье.",
+    feedbackEn:"An accomplice is liable under the same article.", ref:"ст. 33, 158 УК РФ", refEn:"Art. 33, 158 Crim. Code"},
+
+  {block:"Блок 5 · Правовой детектив", blockEn:"Block 5 · Legal detective", title:"Возрастные пороги", titleEn:"Age thresholds", location:"court", icon:"⚖️",
+    situation:"Подросток 15 лет совершил убийство.",
+    situationEn:"A 15-year-old committed murder.",
+    question:"С какого возраста наступает ответственность?", questionEn:"From what age does liability apply?",
+    options:["С 14 лет.","С 16 лет.","С 18 лет."],
+    optionsEn:["From 14.","From 16.","From 18."],
+    correct:0, feedback:"За особо тяжкие — с 14 лет.",
+    feedbackEn:"For especially serious crimes — from 14.", ref:"ст. 20, 105 УК РФ", refEn:"Art. 20, 105 Crim. Code"}
+];
+
+/* ================= JURY CASE ================= */
+const JURY_CASE = {
+  title:"Дело №142-Н", titleEn:"Case No. 142-N",
+  intro:"Группа подростков 14–16 лет подозревается в серии правонарушений. Изучите материалы и вынесите вердикт.",
+  introEn:"A group of teens aged 14–16 is suspected of a series of offenses. Study the materials and deliver a verdict.",
+  steps:[
+    {block:"Эпизод 1", blockEn:"Episode 1", title:"Проникновение в школу", titleEn:"School break-in",
+      situation:"Ночью трое подростков проникли в школу через окно. Ничего не украли, но разбили стекло и повредили сигнализацию.",
+      situationEn:"At night, three teens entered the school through a window. They didn't steal anything but broke glass and damaged the alarm.",
+      question:"Как квалифицировать?", questionEn:"How to qualify?",
+      options:["Хулиганство (ст. 213 УК) — с 14 лет.","Только административка.","Ничего, они же не украли."],
+      optionsEn:["Hooliganism (Art. 213) — from 14.","Only administrative.","Nothing, they didn't steal."],
+      correct:0, feedback:"Проникновение с повреждением из хулиганских побуждений — ст. 213 УК.",
+      feedbackEn:"Break-in with damage from hooligan motives — Art. 213.", ref:"ст. 213 УК РФ", refEn:"Art. 213 Crim. Code"},
+
+    {block:"Эпизод 2", blockEn:"Episode 2", title:"Кража телефона", titleEn:"Phone theft",
+      situation:"14-летний выхватил у одноклассника телефон (25 000 ₽) и скрылся.",
+      situationEn:"A 14-year-old snatched a phone (25,000 ₽) from a classmate and fled.",
+      question:"Квалификация?", questionEn:"Qualification?",
+      options:["Кража (ст. 158 УК).","Грабёж (ст. 161 УК).","Самоуправство."],
+      optionsEn:["Theft (Art. 158).","Robbery (Art. 161).","Self-help."],
+      correct:1, feedback:"Открытое хищение — грабёж. С 14 лет.",
+      feedbackEn:"Open embezzlement — robbery. From 14.", ref:"ст. 161 УК РФ", refEn:"Art. 161 Crim. Code"},
+
+    {block:"Эпизод 3", blockEn:"Episode 3", title:"Допрос и права", titleEn:"Interrogation and rights",
+      situation:"На допросе 14-летний отказался отвечать без родителей. Следователь продолжает.",
+      situationEn:"During interrogation, the 14-year-old refused to answer without parents. The investigator continues.",
+      question:"Прав ли подросток?", questionEn:"Is the teen right?",
+      options:["Нет, обязан отвечать.","Да, имеет право на законного представителя.","Может вообще не приходить."],
+      optionsEn:["No, he must answer.","Yes, he has the right to a legal representative.","He can skip altogether."],
+      correct:1, feedback:"Ст. 425 УПК — обязателен педагог или законный представитель.",
+      feedbackEn:"Art. 425 CPC — a teacher or legal representative is required.", ref:"ст. 425 УПК РФ", refEn:"Art. 425 CPC"}
+  ]
+};
+
+/* ================= ADVOCATE CASE ================= */
+const ADVOCATE_CASE = {
+  title:"Дело клиента Максима", titleEn:"Case of client Maxim",
+  intro:"Вы — адвокат. Ваш клиент — 15-летний Максим, обвиняется в нескольких эпизодах. Изучите материалы и выстройте защиту.",
+  introEn:"You are a defense lawyer. Your client is 15-year-old Maxim, charged in several episodes. Study materials and build a defense.",
+  steps:[
+    {block:"Встреча с клиентом", blockEn:"Client meeting", title:"Первая консультация", titleEn:"First consultation",
+      situation:"Максим говорит: «Я ничего не делал! Меня просто задержали вместе со всеми.» Вы должны выяснить обстоятельства.",
+      situationEn:"Maxim says: 'I didn't do anything! I was just detained with everyone else.' You need to find out the circumstances.",
+      question:"С чего начнёте?", questionEn:"Where do you start?",
+      options:["Сразу заявлю о невиновности.","Уточню детали задержания и состав участников.","Откажусь от дела."],
+      optionsEn:["Immediately claim innocence.","Clarify detention details and participants.","Refuse the case."],
+      correct:1, feedback:"Адвокат сначала выясняет факты: время, место, роль клиента, свидетелей.",
+      feedbackEn:"A lawyer first finds out the facts: time, place, client's role, witnesses.", ref:"ст. 49 УПК РФ", refEn:"Art. 49 CPC"},
+
+    {block:"Изучение материалов", blockEn:"Case study", title:"Оценка эпизода", titleEn:"Assessing the episode",
+      situation:"Выяснилось: Максим стоял рядом, пока 16-летний друг разбивал витрину. Максим не участвовал, но не помешал.",
+      situationEn:"It turned out: Maxim stood nearby while a 16-year-old friend smashed a shop window. Maxim didn't participate but didn't stop it.",
+      question:"Есть ли состав в действиях Максима?", questionEn:"Is there an offense in Maxim's actions?",
+      options:["Да, пособничество.","Нет — он не совершал действий и не готовил их.","Да, но только как свидетель."],
+      optionsEn:["Yes, complicity.","No — he didn't act or prepare.","Yes, but only as a witness."],
+      correct:1, feedback:"Пособничество требует умысла и конкретных действий. Просто присутствие — не состав.",
+      feedbackEn:"Complicity requires intent and concrete actions. Mere presence is not an offense.", ref:"ст. 33 УК РФ", refEn:"Art. 33 Crim. Code"},
+
+    {block:"Допрос", blockEn:"Interrogation", title:"Тактика защиты", titleEn:"Defense tactics",
+      situation:"Следователь настаивает на допросе Максима без родителей «для скорости».",
+      situationEn:"The investigator insists on interrogating Maxim without parents 'for speed'.",
+      question:"Ваши действия?", questionEn:"Your actions?",
+      options:["Соглашусь — быстрее.","Потребую присутствия законного представителя и педагога.","Откажусь от допроса полностью."],
+      optionsEn:["I'll agree — faster.","I'll demand a legal representative and teacher.","I'll refuse the interrogation entirely."],
+      correct:1, feedback:"По ст. 425 УПК при допросе несовершеннолетнего до 16 лет обязательно присутствие педагога или психолога, а также законного представителя.",
+      feedbackEn:"Under Art. 425 CPC, for interrogation of a minor under 16, a teacher or psychologist and a legal representative are required.", ref:"ст. 425 УПК РФ", refEn:"Art. 425 CPC"},
+
+    {block:"Итог", blockEn:"Conclusion", title:"Вынесение вердикта", titleEn:"Delivering the verdict",
+      situation:"Суд рассматривает дело. Ваша позиция: Максим не является соучастником — отсутствует состав.",
+      situationEn:"The court is hearing the case. Your position: Maxim is not an accomplice — no offense.",
+      question:"Какой приговор наиболее вероятен?", questionEn:"Which verdict is most likely?",
+      options:["Оправдательный — нет состава.","Условное осуждение.","Лишение свободы на 5 лет."],
+      optionsEn:["Acquittal — no offense.","Suspended sentence.","Imprisonment for 5 years."],
+      correct:0, feedback:"При отсутствии состава преступления суд выносит оправдательный приговор.",
+      feedbackEn:"If there is no offense, the court issues an acquittal.", ref:"ст. 302 УПК РФ", refEn:"Art. 302 CPC"}
+  ]
+};
+
+/* ================= MAP ================= */
+const MAP_LOCATIONS = [
+  {id:"school", icon:"🏫", label:"Школа", labelEn:"School", x:20, y:25, blockFilter:"Блок 1"},
+  {id:"street", icon:"🚦", label:"Улица", labelEn:"Street", x:50, y:15, blockFilter:"Блок 1"},
+  {id:"park",   icon:"🌳", label:"Парк", labelEn:"Park", x:80, y:28, blockFilter:"Блок 1"},
+  {id:"home",   icon:"🏠", label:"Дом", labelEn:"Home", x:15, y:60, blockFilter:"Блок 2"},
+  {id:"police", icon:"🚔", label:"Отдел ПДН", labelEn:"Juvenile Dept.", x:50, y:50, blockFilter:"Блок 4"},
+  {id:"court",  icon:"🏛", label:"Суд", labelEn:"Court", x:82, y:65, blockFilter:"Блок 4"},
+  {id:"mall",   icon:"🏬", label:"ТЦ", labelEn:"Mall", x:35, y:82, blockFilter:"Блок 5"},
+  {id:"final",  icon:"⚖️", label:"Финал", labelEn:"Final", x:65, y:90, blockFilter:"Блок 5"}
+];
+
+/* ================= ACHIEVEMENTS ================= */
+const ACHIEVEMENTS = [
+  {id:"first_win", icon:"🎯", name:"Первая победа", nameEn:"First win", desc:"Пройти игру до конца", descEn:"Complete a game"},
+  {id:"perfect", icon:"🏆", name:"Идеально", nameEn:"Perfect", desc:"15/15 верных", descEn:"15/15 correct"},
+  {id:"smart", icon:"⚖️", name:"Правовед", nameEn:"Legal expert", desc:"10+ верных", descEn:"10+ correct"},
+  {id:"koadm", icon:"🛡️", name:"Знаток КоАП", nameEn:"Admin Code expert", desc:"5+ верных", descEn:"5+ correct"},
+  {id:"duelist", icon:"⚔️", name:"Дуэлянт", nameEn:"Duelist", desc:"Сыграть дуэль", descEn:"Play a duel"},
+  {id:"dominant", icon:"🔥", name:"Разгром", nameEn:"Dominant", desc:"Победа +40", descEn:"Win by +40"},
+  {id:"juror", icon:"⚖️", name:"Присяжный", nameEn:"Juror", desc:"Пройти суд", descEn:"Complete jury trial"},
+  {id:"advocate", icon:"🏛", name:"Адвокат", nameEn:"Advocate", desc:"Пройти сюжет", descEn:"Complete story"},
+  {id:"daily", icon:"📅", name:"Ежедневник", nameEn:"Daily", desc:"Кейс дня", descEn:"Daily case"},
+  {id:"weekly", icon:"📚", name:"Эрудит", nameEn:"Scholar", desc:"Открыть справочник", descEn:"Open reference"},
+  {id:"leader", icon:"👑", name:"Лидер", nameEn:"Leader", desc:"1 место", descEn:"1st place"},
+  {id:"streak5", icon:"🔥", name:"Серия 5", nameEn:"Streak 5", desc:"5 дней подряд", descEn:"5 days in a row"},
+  {id:"cartographer", icon:"🗺", name:"Картограф", nameEn:"Cartographer", desc:"Пройти 5 локаций", descEn:"Visit 5 locations"},
+  {id:"flashmaster", icon:"🎴", name:"Мастер карт", nameEn:"Flash master", desc:"Просмотреть 20 карт", descEn:"View 20 cards"}
+];
+
+/* ================= STORAGE ================= */
+const STORAGE = {
+  lb:'legal_nav_lb_v61', ach:'legal_nav_ach_v61', stats:'legal_nav_stats_v61',
+  daily:'legal_nav_daily_v61', theme:'legal_nav_theme_v61', lang:'legal_nav_lang_v61',
+  streak:'legal_nav_streak_v61', progress:'legal_nav_progress_v61', ambience:'legal_nav_ambience_v61',
+  fcIdx:'legal_nav_fcidx_v61', shuffle:'legal_nav_shuffle_v61'
+};
+
+function lsGet(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function lsDel(key){ try{ localStorage.removeItem(key); }catch(e){} }
+
+function loadLB(){ return lsGet(STORAGE.lb, []); }
+function saveLB(v){ lsSet(STORAGE.lb, v); }
+function loadAch(){ return lsGet(STORAGE.ach, {}); }
+function saveAch(v){ lsSet(STORAGE.ach, v); }
+function loadStats(){ return lsGet(STORAGE.stats, {games:0,wins:0,totalCorrect:0,totalAnswered:0,duelWins:0,juryWins:0,advocateWins:0,dailyDone:0,bestScore:0,blockStats:{}}); }
+function saveStats(v){ lsSet(STORAGE.stats, v); }
+function loadDaily(){ return lsGet(STORAGE.daily, {}); }
+function saveDaily(v){ lsSet(STORAGE.daily, v); }
+function loadProgress(){ return lsGet(STORAGE.progress, {visitedLocations:[]}); }
+function saveProgress(v){ lsSet(STORAGE.progress, v); }
+function loadStreak(){ return lsGet(STORAGE.streak, {count:0, lastDate:''}); }
+function saveStreak(v){ lsSet(STORAGE.streak, v); }
+
+function unlockAchievement(id){
+  const ach = loadAch();
+  if(!ach[id]){
+    ach[id] = Date.now();
+    saveAch(ach);
+    Sfx.achievement();
+    const meta = ACHIEVEMENTS.find(a => a.id === id);
+    if(meta){
+      const name = LANG === 'en' ? meta.nameEn : meta.name;
+      showToast(`${meta.icon} ${name}`);
+    }
+  }
+}
+
+/* ================= STATE ================= */
+let state = {
+  mode:'single', current:0, score:0, correctCount:0, answered:false,
+  duel:{p1:0, p2:0, turn:1, p1Answer:null},
+  jury:{step:0, score:0, correct:0},
+  advocate:{step:0, score:0, correct:0},
+  daily:{correct:0, answered:false},
+  shuffle:false,
+  currentPool:null
+};
+let currentLbMode = 'single';
+let fcIdx = lsGet(STORAGE.fcIdx, 0);
+const $ = id => document.getElementById(id);
+
+/* ================= HELPERS ================= */
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function prepareOptions(lvl){
+  const baseOptions = (LANG === 'en' && lvl.optionsEn) ? lvl.optionsEn : lvl.options;
+  if(!state.shuffle){
+    return { options: baseOptions, correct: lvl.correct };
+  }
+  const indexed = baseOptions.map((opt, i) => ({opt, isCorrect: i === lvl.correct}));
+  const shuffled = shuffleArray(indexed);
+  const newCorrect = shuffled.findIndex(o => o.isCorrect);
+  return { options: shuffled.map(o => o.opt), correct: newCorrect };
+}
+function tr(lvl, field){
+  if(LANG === 'en' && lvl[field + 'En']) return lvl[field + 'En'];
+  return lvl[field];
+}
+
+/* ================= TOAST ================= */
+let toastTimer = null;
+function showToast(text){
+  const t = $('toast');
+  t.innerHTML = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+/* ================= MODAL ================= */
+function openModal(html){
+  $('modal-content').innerHTML = html;
+  $('modal-overlay').classList.add('show');
+}
+function closeModal(){ $('modal-overlay').classList.remove('show'); }
+$('modal-overlay').addEventListener('click', e => { if(e.target === $('modal-overlay')) closeModal(); });
+
+/* ================= THEME ================= */
+function applyTheme(theme){
+  document.body.classList.remove('theme-light','theme-sepia');
+  if(theme === 'light') document.body.classList.add('theme-light');
+  else if(theme === 'sepia') document.body.classList.add('theme-sepia');
+  lsSet(STORAGE.theme, theme);
+}
+
+/* ================= MENU ================= */
+function backToMenu(){
+  Sfx.click();
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  const s = $('start-screen');
+  s.style.display = 'block';
+  s.classList.remove('slide-in'); void s.offsetWidth; s.classList.add('slide-in');
+  updateDailyBtn();
+}
+
+/* ================= STREAK ================= */
+function updateStreakOnPlay(){
+  const today = new Date().toISOString().slice(0,10);
+  const s = loadStreak();
+  if(s.lastDate === today) return;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(s.lastDate === yesterday) s.count++;
+  else s.count = 1;
+  s.lastDate = today;
+  saveStreak(s);
+  if(s.count >= 5) unlockAchievement('streak5');
+}
+
+/* ================= DAILY ================= */
+function getDailyIndex(){
+  const today = new Date().toISOString().slice(0,10);
+  const seed = today.split('-').reduce((a,b)=>a+parseInt(b),0);
+  return seed % LEVELS.length;
+}
+function updateDailyBtn(){
+  const daily = loadDaily();
+  const today = new Date().toISOString().slice(0,10);
+  const btn = $('daily-btn');
+  const span = document.getElementById('daily-btn-text');
+  if(!span) return;
+  if(daily.date === today){
+    span.textContent = t('daily-done');
+    btn.style.background = 'linear-gradient(180deg, rgba(52,211,153,.2), rgba(52,211,153,.1))';
+  } else {
+    span.textContent = t('daily-todo');
+    btn.style.background = 'linear-gradient(180deg,#4a3a5c,#2a1f3a)';
+  }
+}
+function startDaily(){
+  Sfx.init(); Sfx.click();
+  const idx = getDailyIndex();
+  state = {mode:'daily', current:idx, score:0, correctCount:0, answered:false, duel:{p1:0,p2:0,turn:1,p1Answer:null}, jury:{step:0}, advocate:{step:0}, daily:{correct:0,answered:false}, shuffle:state.shuffle, currentPool:null};
+  showGameScreen();
+  $('duel-hint').style.display = 'block';
+  $('duel-hint').textContent = t('daily-hint');
+  $('jury-steps').style.display = 'none';
+  $('character-bubble').style.display = 'flex';
+  const c = CHARACTERS.advocate;
+  $('character-avatar').textContent = c.avatar;
+  $('character-name').textContent = LANG === 'en' ? c.nameEn : c.name;
+  $('character-text').textContent = LANG === 'en' ? 'Today\'s case — check your knowledge.' : 'Сегодняшний кейс — проверь свои знания.';
+  renderLevel();
+}
+
+/* ================= SINGLE ================= */
+function startSingle(){
+  Sfx.init(); Sfx.click();
+  state = {mode:'single', current:0, score:0, correctCount:0, answered:false, duel:{p1:0,p2:0,turn:1,p1Answer:null}, jury:{step:0}, advocate:{step:0}, shuffle:state.shuffle, currentPool:null};
+  showGameScreen();
+  $('duel-hint').style.display = 'none';
+  $('jury-steps').style.display = 'none';
+  $('character-bubble').style.display = 'none';
+  renderLevel();
+}
+
+/* ================= DUEL ================= */
+function startDuel(){
+  Sfx.init(); Sfx.click();
+  state = {mode:'duel', current:0, score:0, correctCount:0, answered:false, duel:{p1:0,p2:0,turn:1,p1Answer:null}, jury:{step:0}, advocate:{step:0}, shuffle:state.shuffle, currentPool:null};
+  showGameScreen();
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('duel-header').style.display = 'flex';
+  $('duel-hint').style.display = 'block';
+  $('jury-steps').style.display = 'none';
+  $('character-bubble').style.display = 'none';
+  renderDuelLevel();
+}
+
+/* ================= JURY ================= */
+function showJuryIntro(){
+  Sfx.click();
+  openModal(`
+    <h2>${t('modal-jury-title')}</h2>
+    <p><strong>${LANG === 'en' ? JURY_CASE.titleEn : JURY_CASE.title}</strong><br><br>${LANG === 'en' ? JURY_CASE.introEn : JURY_CASE.intro}</p>
+    <div class="modal-buttons">
+      <button class="btn ghost" onclick="closeModal()">${t('modal-cancel')}</button>
+      <button class="btn" onclick="closeModal(); startJury();">${t('modal-jury-start')}</button>
+    </div>
+  `);
+}
+function startJury(){
+  Sfx.init();
+  state = {mode:'jury', current:0, score:0, correctCount:0, answered:false, jury:{step:0,score:0,correct:0}, advocate:{step:0}, shuffle:state.shuffle, currentPool:null};
+  showGameScreen();
+  $('duel-header').style.display = 'none';
+  $('duel-hint').style.display = 'none';
+  $('jury-steps').style.display = 'flex';
+  $('character-bubble').style.display = 'flex';
+  $('character-avatar').textContent = CHARACTERS.judge.avatar;
+  $('character-name').textContent = LANG === 'en' ? CHARACTERS.judge.nameEn : CHARACTERS.judge.name;
+  $('character-text').textContent = getRandomLine(CHARACTERS.judge);
+  renderJuryLevel();
+}
+
+/* ================= ADVOCATE ================= */
+function showAdvocateIntro(){
+  Sfx.click();
+  openModal(`
+    <h2>${t('modal-adv-title')}</h2>
+    <p><strong>${LANG === 'en' ? ADVOCATE_CASE.titleEn : ADVOCATE_CASE.title}</strong><br><br>${LANG === 'en' ? ADVOCATE_CASE.introEn : ADVOCATE_CASE.intro}</p>
+    <p style="color:var(--accent); font-size:13px;">${t('modal-adv-stages')}</p>
+    <div class="modal-buttons">
+      <button class="btn ghost" onclick="closeModal()">${t('modal-cancel')}</button>
+      <button class="btn gold" onclick="closeModal(); startAdvocate();">${t('modal-adv-start')}</button>
+    </div>
+  `);
+}
+function startAdvocate(){
+  Sfx.init();
+  state = {mode:'advocate', current:0, score:0, correctCount:0, answered:false, jury:{step:0}, advocate:{step:0,score:0,correct:0}, duel:{p1:0,p2:0,turn:1,p1Answer:null}, shuffle:state.shuffle, currentPool:null};
+  showGameScreen();
+  $('duel-header').style.display = 'none';
+  $('duel-hint').style.display = 'none';
+  $('jury-steps').style.display = 'flex';
+  $('character-bubble').style.display = 'flex';
+  $('character-avatar').textContent = CHARACTERS.advocate.avatar;
+  $('character-name').textContent = LANG === 'en' ? CHARACTERS.advocate.nameEn : CHARACTERS.advocate.name;
+  $('character-text').textContent = LANG === 'en' ? 'Let\'s start the defense. Studying the materials.' : 'Приступим к защите. Изучаем материалы.';
+  renderAdvocateLevel();
+}
+
+/* ================= GAME SCREEN ================= */
+function showGameScreen(){
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('game-screen').style.display = 'block';
+  if(state.mode === 'single' || state.mode === 'daily' || state.mode === 'advocate' || state.mode === 'jury'){
+    $('hud').style.display = 'grid';
+    $('progress-wrap').style.display = 'block';
+  } else {
+    $('hud').style.display = 'none';
+    $('progress-wrap').style.display = 'none';
+  }
+  const card = $('game-screen');
+  card.classList.remove('slide-in'); void card.offsetWidth; card.classList.add('slide-in');
+}
+
+/* ================= RENDER SINGLE ================= */
+function renderLevel(){
+  const lvl = LEVELS[state.current];
+  state.answered = false;
+  const prepared = prepareOptions(lvl);
+  state.currentPool = prepared;
+
+  const c = getCharacterForBlock(lvl.block);
+  $('character-bubble').style.display = 'flex';
+  $('character-avatar').textContent = c.avatar;
+  $('character-name').textContent = LANG === 'en' ? c.nameEn : c.name;
+  $('character-text').textContent = getRandomLine(c);
+
+  $('block-tag').textContent = tr(lvl, 'block');
+  $('level-title').textContent = tr(lvl, 'title');
+  $('situation').textContent = tr(lvl, 'situation');
+  $('question').textContent = tr(lvl, 'question');
+  $('feedback').className = 'feedback';
+  $('feedback').innerHTML = '';
+  $('next-btn').style.display = 'none';
+
+  const opts = $('options');
+  opts.innerHTML = '';
+  prepared.options.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = text;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+  updateHUD();
+}
+
+function selectAnswer(index){
+  if(state.answered) return;
+  state.answered = true;
+  const lvl = LEVELS[state.current];
+  const correct = state.currentPool.correct;
+  document.querySelectorAll('.option').forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if(i === correct) btn.classList.add('correct');
+    else if(i === index) btn.classList.add('wrong');
+    btn.onclick = null;
+  });
+  const isCorrect = index === correct;
+  if(isCorrect){ state.score += 10; state.correctCount++; Sfx.correct(); }
+  else Sfx.wrong();
+
+  if(state.mode === 'daily'){
+    state.daily.correct = isCorrect ? 1 : 0;
+    state.daily.answered = true;
+    const d = loadDaily();
+    d.date = new Date().toISOString().slice(0,10);
+    d.result = isCorrect ? 'win' : 'lose';
+    saveDaily(d);
+    const stats = loadStats();
+    stats.dailyDone = (stats.dailyDone||0) + 1;
+    saveStats(stats);
+    unlockAchievement('daily');
+    updateStreakOnPlay();
+  }
+
+  showFeedback(isCorrect, lvl);
+  $('next-btn').style.display = 'block';
+  if(state.mode === 'daily') $('next-btn').textContent = t('result-finish');
+  else if(state.current === LEVELS.length - 1) $('next-btn').textContent = t('result-finish');
+  else $('next-btn').textContent = t('result-next');
+  updateHUD();
+}
+
+function showFeedback(isCorrect, lvl){
+  const fb = $('feedback');
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'no');
+  const okText = LANG === 'en' ? '✅ Correct!' : '✅ Верно!';
+  const noText = LANG === 'en' ? '❌ Not quite.' : '❌ Не совсем.';
+  fb.innerHTML = `<strong>${isCorrect ? okText : noText}</strong><br>${tr(lvl, 'feedback')}<br><span class="ref">📖 ${tr(lvl, 'ref')}</span>`;
+}
+
+function updateHUD(){
+  if(state.mode === 'jury'){
+    $('hud-level').textContent = (state.jury.step + 1) + '/' + JURY_CASE.steps.length;
+    $('hud-score').textContent = state.jury.score;
+    $('hud-block').textContent = LANG === 'en' ? 'Jury' : 'Присяжные';
+    $('progress-bar').style.width = ((state.jury.step) / JURY_CASE.steps.length) * 100 + '%';
+    return;
+  }
+  if(state.mode === 'advocate'){
+    $('hud-level').textContent = (state.advocate.step + 1) + '/' + ADVOCATE_CASE.steps.length;
+    $('hud-score').textContent = state.advocate.score;
+    $('hud-block').textContent = LANG === 'en' ? 'Advocate' : 'Адвокат';
+    $('progress-bar').style.width = ((state.advocate.step) / ADVOCATE_CASE.steps.length) * 100 + '%';
+    return;
+  }
+  if(state.mode === 'daily'){
+    $('hud-level').textContent = '📅';
+    $('hud-score').textContent = state.score;
+    $('hud-block').textContent = LANG === 'en' ? 'Daily' : 'Ежедневка';
+    $('progress-bar').style.width = '50%';
+    return;
+  }
+  $('hud-level').textContent = (state.current + 1) + '/' + LEVELS.length;
+  $('hud-score').textContent = state.score;
+  $('hud-block').textContent = LEVELS[state.current].block.split('·')[0].trim();
+  $('progress-bar').style.width = (state.current / LEVELS.length) * 100 + '%';
+}
+
+function nextLevel(){
+  Sfx.click();
+  if(state.mode === 'daily'){ showResult(); return; }
+  if(state.mode === 'jury'){
+    if(state.jury.step < JURY_CASE.steps.length - 1){
+      state.jury.step++; state.answered = false;
+      $('character-text').textContent = getRandomLine(CHARACTERS.judge);
+      renderJuryLevel();
+    } else showResult();
+    return;
+  }
+  if(state.mode === 'advocate'){
+    if(state.advocate.step < ADVOCATE_CASE.steps.length - 1){
+      state.advocate.step++; state.answered = false;
+      $('character-text').textContent = getRandomLine(CHARACTERS.advocate);
+      renderAdvocateLevel();
+    } else showResult();
+    return;
+  }
+  if(state.current < LEVELS.length - 1){
+    state.current++;
+    if(state.mode === 'single') renderLevel();
+    else { state.duel.turn = 1; state.duel.p1Answer = null; renderDuelLevel(); }
+  } else showResult();
+}
+
+/* ================= JURY RENDER ================= */
+function renderJuryLevel(){
+  const step = JURY_CASE.steps[state.jury.step];
+  state.answered = false;
+  const prepared = prepareOptions(step);
+  state.currentPool = prepared;
+
+  $('block-tag').textContent = tr(step, 'block');
+  $('level-title').textContent = tr(step, 'title');
+  $('situation').textContent = tr(step, 'situation');
+  $('question').textContent = tr(step, 'question');
+  $('feedback').className = 'feedback';
+  $('feedback').innerHTML = '';
+  $('next-btn').style.display = 'none';
+
+  const steps = $('jury-steps');
+  steps.innerHTML = '';
+  JURY_CASE.steps.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'jury-step' + (i < state.jury.step ? ' done' : i === state.jury.step ? ' active' : '');
+    steps.appendChild(d);
+  });
+
+  const opts = $('options');
+  opts.innerHTML = '';
+  prepared.options.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = text;
+    btn.onclick = () => selectJuryAnswer(i);
+    opts.appendChild(btn);
+  });
+  updateHUD();
+}
+
+function selectJuryAnswer(index){
+  if(state.answered) return;
+  state.answered = true;
+  const step = JURY_CASE.steps[state.jury.step];
+  const correct = state.currentPool.correct;
+  document.querySelectorAll('.option').forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if(i === correct) btn.classList.add('correct');
+    else if(i === index) btn.classList.add('wrong');
+    btn.onclick = null;
+  });
+  const isCorrect = index === correct;
+  if(isCorrect){ state.jury.score += 10; state.jury.correct++; state.score += 10; Sfx.correct(); }
+  else Sfx.wrong();
+
+  const fb = $('feedback');
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'no');
+  const okText = LANG === 'en' ? '✅ Correct!' : '✅ Верно!';
+  const noText = LANG === 'en' ? '❌ Not quite.' : '❌ Не совсем.';
+  fb.innerHTML = `<strong>${isCorrect ? okText : noText}</strong><br>${tr(step, 'feedback')}<br><span class="ref">📖 ${tr(step, 'ref')}</span>`;
+
+  $('next-btn').style.display = 'block';
+  $('next-btn').textContent = (state.jury.step === JURY_CASE.steps.length - 1) ? t('result-verdict') : t('result-next-episode');
+  updateHUD();
+}
+
+/* ================= ADVOCATE RENDER ================= */
+function renderAdvocateLevel(){
+  const step = ADVOCATE_CASE.steps[state.advocate.step];
+  state.answered = false;
+  const prepared = prepareOptions(step);
+  state.currentPool = prepared;
+
+  $('block-tag').textContent = tr(step, 'block');
+  $('level-title').textContent = tr(step, 'title');
+  $('situation').textContent = tr(step, 'situation');
+  $('question').textContent = tr(step, 'question');
+  $('feedback').className = 'feedback';
+  $('feedback').innerHTML = '';
+  $('next-btn').style.display = 'none';
+
+  const steps = $('jury-steps');
+  steps.innerHTML = '';
+  ADVOCATE_CASE.steps.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'jury-step' + (i < state.advocate.step ? ' done' : i === state.advocate.step ? ' active' : '');
+    steps.appendChild(d);
+  });
+
+  const opts = $('options');
+  opts.innerHTML = '';
+  prepared.options.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = text;
+    btn.onclick = () => selectAdvocateAnswer(i);
+    opts.appendChild(btn);
+  });
+  updateHUD();
+}
+
+function selectAdvocateAnswer(index){
+  if(state.answered) return;
+  state.answered = true;
+  const step = ADVOCATE_CASE.steps[state.advocate.step];
+  const correct = state.currentPool.correct;
+  document.querySelectorAll('.option').forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if(i === correct) btn.classList.add('correct');
+    else if(i === index) btn.classList.add('wrong');
+    btn.onclick = null;
+  });
+  const isCorrect = index === correct;
+  if(isCorrect){ state.advocate.score += 10; state.advocate.correct++; state.score += 10; Sfx.correct(); }
+  else Sfx.wrong();
+
+  const fb = $('feedback');
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'no');
+  const okText = LANG === 'en' ? '✅ Correct!' : '✅ Верно!';
+  const noText = LANG === 'en' ? '❌ Not quite.' : '❌ Не совсем.';
+  fb.innerHTML = `<strong>${isCorrect ? okText : noText}</strong><br>${tr(step, 'feedback')}<br><span class="ref">📖 ${tr(step, 'ref')}</span>`;
+
+  $('next-btn').style.display = 'block';
+  $('next-btn').textContent = (state.advocate.step === ADVOCATE_CASE.steps.length - 1) ? t('result-adv-finish') : t('result-adv-next');
+  updateHUD();
+}
+
+/* ================= DUEL ================= */
+function renderDuelLevel(){
+  const lvl = LEVELS[state.current];
+  const prepared = prepareOptions(lvl);
+  state.currentPool = prepared;
+
+  $('duel-p1').textContent = state.duel.p1;
+  $('duel-p2').textContent = state.duel.p2;
+  const badge = $('turn-badge');
+  badge.textContent = (state.duel.turn === 1 ? t('duel-turn-1') : t('duel-turn-2'));
+  badge.className = 'turn-badge ' + (state.duel.turn === 1 ? 'p1' : 'p2');
+  $('block-tag').textContent = tr(lvl, 'block');
+  $('level-title').textContent = tr(lvl, 'title');
+  $('situation').textContent = tr(lvl, 'situation');
+  $('question').textContent = tr(lvl, 'question');
+  $('duel-hint').textContent = state.duel.turn === 1 ? t('duel-hint-1') : t('duel-hint-2');
+  $('feedback').className = 'feedback';
+  $('feedback').innerHTML = '';
+  $('next-btn').style.display = 'none';
+  const opts = $('options');
+  opts.innerHTML = '';
+  prepared.options.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = text;
+    btn.onclick = () => duelSelect(i);
+    opts.appendChild(btn);
+  });
+}
+
+function duelSelect(index){
+  const lvl = LEVELS[state.current];
+  const correct = state.currentPool.correct;
+  if(state.duel.turn === 1){
+    state.duel.p1Answer = index;
+    if(index === correct){ state.duel.p1 += 10; Sfx.correct(); }
+    else Sfx.wrong();
+    document.querySelectorAll('.option').forEach((btn, i) => {
+      btn.classList.add('disabled');
+      if(i === index) btn.classList.add('p1-pick');
+      btn.onclick = null;
+    });
+    const fb = $('feedback');
+    fb.className = 'feedback show';
+    fb.style.background = 'rgba(110,168,220,.08)';
+    fb.style.borderLeft = '3px solid var(--p1)';
+    fb.innerHTML = t('duel-p1-answered');
+    state.duel.turn = 2;
+    $('duel-p1').textContent = state.duel.p1;
+    $('duel-hint').textContent = t('duel-hint-2');
+    const badge = $('turn-badge');
+    badge.textContent = t('duel-turn-2');
+    badge.className = 'turn-badge p2';
+    setTimeout(() => {
+      const opts = $('options');
+      opts.innerHTML = '';
+      state.currentPool.options.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = text;
+        btn.onclick = () => duelSelect(i);
+        opts.appendChild(btn);
+      });
+      $('feedback').className = 'feedback';
+      $('feedback').innerHTML = '';
+      $('feedback').style = '';
+    }, 900);
+  } else {
+    if(index === correct){ state.duel.p2 += 10; Sfx.correct(); }
+    else Sfx.wrong();
+    document.querySelectorAll('.option').forEach((btn, i) => {
+      btn.classList.add('disabled');
+      if(i === correct) btn.classList.add('correct');
+      if(i === index && i !== correct) btn.classList.add('wrong');
+      if(i === index) btn.classList.add('p2-pick');
+      btn.onclick = null;
+    });
+    $('duel-p2').textContent = state.duel.p2;
+    const p1Ok = state.duel.p1Answer === correct;
+    const p2Ok = index === correct;
+    const fb = $('feedback');
+    fb.className = 'feedback show ' + (p2Ok ? 'ok' : 'no');
+    fb.innerHTML = `<strong>${t('duel-round-result')}</strong><br>${t('duel-p1')}: ${p1Ok ? '✅ +10' : '❌ 0'}<br>${t('duel-p2')}: ${p2Ok ? '✅ +10' : '❌ 0'}<br><br>${tr(lvl, 'feedback')}<br><span class="ref">📖 ${tr(lvl, 'ref')}</span>`;
+    $('next-btn').style.display = 'block';
+    $('next-btn').textContent = (state.current === LEVELS.length - 1) ? t('result-totals') : t('result-next-round');
+  }
+}
+
+/* ================= RESULT ================= */
+function showResult(){
+  Sfx.finish();
+  $('game-screen').style.display = 'none';
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('result-screen').style.display = 'block';
+  const card = $('result-screen');
+  card.classList.remove('slide-in'); void card.offsetWidth; card.classList.add('slide-in');
+
+  const saveBlock = $('save-score-block');
+  const ach = $('achievements');
+  const juryBlock = $('jury-result-block');
+  const quoteBlock = $('quote-block');
+  const certBlock = $('certificate-block');
+  ach.innerHTML = '';
+  juryBlock.innerHTML = ''; juryBlock.style.display = 'none';
+  quoteBlock.style.display = 'none';
+  certBlock.style.display = 'none';
+
+  const stats = loadStats();
+  stats.games = (stats.games||0) + 1;
+  if(!stats.blockStats) stats.blockStats = {};
+
+  // ADVOCATE
+  if(state.mode === 'advocate'){
+    const score = state.advocate.score;
+    const correct = state.advocate.correct;
+    const total = ADVOCATE_CASE.steps.length;
+    let emoji = '🏛', title = '', verdict = '';
+    if(LANG === 'en'){
+      if(correct === total){ emoji = '🏆'; title = 'Brilliant defense!'; verdict = 'You won the case. Client acquitted.'; }
+      else if(correct >= 2){ emoji = '⚖️'; title = 'Case partially won'; verdict = 'Client got a suspended sentence.'; }
+      else { emoji = '📜'; title = 'Case lost'; verdict = 'The court found the client guilty.'; }
+    } else {
+      if(correct === total){ emoji = '🏆'; title = 'Блестящая защита!'; verdict = 'Вы выиграли дело. Клиент оправдан.'; }
+      else if(correct >= 2){ emoji = '⚖️'; title = 'Дело выиграно частично'; verdict = 'Клиент получил условное наказание.'; }
+      else { emoji = '📜'; title = 'Дело проиграно'; verdict = 'Суд признал клиента виновным.'; }
+    }
+    $('result-emoji').textContent = emoji;
+    $('result-title').textContent = title;
+    $('result-text').innerHTML = LANG === 'en'
+      ? `Correct decisions: <strong>${correct}/${total}</strong><br>Score: <strong>${score}</strong>`
+      : `Правильных решений: <strong>${correct} из ${total}</strong><br>Очки: <strong>${score}</strong>`;
+    juryBlock.style.display = 'block';
+    juryBlock.innerHTML = `<div class="jury-verdict"><span class="icon">${emoji}</span><h3>${title}</h3><p>${verdict}</p></div>`;
+    unlockAchievement('advocate');
+    if(correct === total) stats.advocateWins = (stats.advocateWins||0) + 1;
+    stats.totalCorrect += correct;
+    stats.totalAnswered += total;
+    stats.bestScore = Math.max(stats.bestScore, score);
+    saveStats(stats);
+    updateStreakOnPlay();
+    saveBlock.style.display = 'block';
+    $('player-name').placeholder = LANG === 'en' ? 'Lawyer name' : 'Имя адвоката';
+    saveBlock.dataset.score = score;
+    saveBlock.dataset.mode = 'advocate';
+    return;
+  }
+
+  // JURY
+  if(state.mode === 'jury'){
+    const score = state.jury.score;
+    const correct = state.jury.correct;
+    const total = JURY_CASE.steps.length;
+    let emoji = '⚖️', title = '', verdict = '';
+    if(LANG === 'en'){
+      if(correct === total){ emoji = '🏛'; title = 'Guilty verdict'; verdict = 'Jury unanimous: defendants guilty.'; }
+      else if(correct >= 2){ emoji = '⚖️'; title = 'Mixed verdict'; verdict = 'Some episodes need further review.'; }
+      else { emoji = '📜'; title = 'Acquittal'; verdict = 'No offense established.'; }
+    } else {
+      if(correct === total){ emoji = '🏛'; title = 'Обвинительный вердикт'; verdict = 'Присяжные единогласны: подсудимые виновны.'; }
+      else if(correct >= 2){ emoji = '⚖️'; title = 'Смешанный вердикт'; verdict = 'Часть эпизодов требует дополнительного рассмотрения.'; }
+      else { emoji = '📜'; title = 'Оправдательный вердикт'; verdict = 'Состав преступления не установлен.'; }
+    }
+    $('result-emoji').textContent = emoji;
+    $('result-title').textContent = title;
+    $('result-text').innerHTML = LANG === 'en'
+      ? `Correct: <strong>${correct}/${total}</strong><br>Score: <strong>${score}</strong>`
+      : `Правильно: <strong>${correct} из ${total}</strong><br>Очки: <strong>${score}</strong>`;
+    juryBlock.style.display = 'block';
+    juryBlock.innerHTML = `<div class="jury-verdict"><span class="icon">${emoji}</span><h3>${title}</h3><p>${verdict}</p></div>`;
+    ach.innerHTML += `<span class="achievement">⚖️ ${LANG === 'en' ? 'Juror' : 'Присяжный'}</span>`;
+    unlockAchievement('juror');
+    if(correct === total) stats.juryWins = (stats.juryWins||0) + 1;
+    stats.totalCorrect += correct;
+    stats.totalAnswered += total;
+    stats.bestScore = Math.max(stats.bestScore, score);
+    saveStats(stats);
+    updateStreakOnPlay();
+    saveBlock.style.display = 'block';
+    $('player-name').placeholder = LANG === 'en' ? 'Juror name' : 'Имя присяжного';
+    saveBlock.dataset.score = score;
+    saveBlock.dataset.mode = 'jury';
+    return;
+  }
+
+  // DAILY
+  if(state.mode === 'daily'){
+    const isWin = state.daily.correct === 1;
+    $('result-emoji').textContent = isWin ? '📅✅' : '📅';
+    $('result-title').textContent = isWin ? t('daily-win-title') : t('daily-lose-title');
+    $('result-text').innerHTML = isWin ? t('daily-win-text') : t('daily-lose-text');
+    if(isWin) ach.innerHTML += `<span class="achievement">📅 ${LANG === 'en' ? 'Daily' : 'Ежедневник'}</span>`;
+    stats.bestScore = Math.max(stats.bestScore, state.score);
+    saveStats(stats);
+    saveBlock.style.display = 'none';
+    return;
+  }
+
+  // DUEL
+  if(state.mode === 'duel'){
+    const p1 = state.duel.p1, p2 = state.duel.p2;
+    let emoji = '🤝', title = t('duel-draw');
+    if(p1 > p2){ emoji = '🔵'; title = t('duel-winner-1'); }
+    else if(p2 > p1){ emoji = '🟣'; title = t('duel-winner-2'); }
+    $('result-emoji').textContent = emoji;
+    $('result-title').textContent = title;
+    $('result-text').innerHTML = `${t('duel-p1')}: <strong>${p1}</strong><br>${t('duel-p2')}: <strong>${p2}</strong>`;
+    unlockAchievement('duelist');
+    if(Math.abs(p1-p2) >= 40){ ach.innerHTML += `<span class="achievement">🔥 ${LANG === 'en' ? 'Dominant win' : 'Разгромная победа'}</span>`; unlockAchievement('dominant'); }
+    if(p1 !== p2) stats.duelWins = (stats.duelWins||0) + 1;
+    saveStats(stats);
+    updateStreakOnPlay();
+    saveBlock.style.display = 'block';
+    $('player-name').placeholder = t('duel-name-ph');
+    saveBlock.dataset.score = Math.max(p1, p2);
+    saveBlock.dataset.mode = 'duel';
+    return;
+  }
+
+  // SINGLE
+  const total = LEVELS.length * 10;
+  const percent = Math.round((state.score / total) * 100);
+  let emoji = '📘', title = '', text = '';
+  if(LANG === 'en'){
+    if(percent === 100){ emoji='🏆'; title='Perfect!'; text='All answers are correct!'; }
+    else if(percent >= 70){ emoji='🥈'; title='Good result!'; text='You know the legal norms well.'; }
+    else if(percent >= 40){ emoji='🥉'; title='Decent start!'; text='Foundations are there, review the articles.'; }
+    else { title='Try again!'; text='Law is complex. Start with Block 1.'; }
+  } else {
+    if(percent === 100){ emoji='🏆'; title='Идеально!'; text='Все ответы верны!'; }
+    else if(percent >= 70){ emoji='🥈'; title='Хороший результат!'; text='Ты неплохо разбираешься в правовых нормах.'; }
+    else if(percent >= 40){ emoji='🥉'; title='Неплохо для начала!'; text='Основы есть, стоит повторить статьи.'; }
+    else { title='Попробуй ещё раз!'; text='Право — сложная наука. Начни с блока 1.'; }
+  }
+
+  $('result-emoji').textContent = emoji;
+  $('result-title').textContent = title;
+  $('result-text').innerHTML = LANG === 'en'
+    ? `Correct: <strong>${state.correctCount}/${LEVELS.length}</strong><br>Score: <strong>${state.score} / ${total}</strong> (${percent}%)<br><br>${text}`
+    : `Правильных: <strong>${state.correctCount} из ${LEVELS.length}</strong><br>Очки: <strong>${state.score} из ${total}</strong> (${percent}%)<br><br>${text}`;
+
+  stats.totalCorrect += state.correctCount;
+  stats.totalAnswered += LEVELS.length;
+  stats.bestScore = Math.max(stats.bestScore, state.score);
+  saveStats(stats);
+
+  unlockAchievement('first_win');
+  if(state.correctCount === LEVELS.length){ ach.innerHTML += `<span class="achievement">🏅 ${LANG === 'en' ? 'Criminal Code Expert' : 'Знаток УК РФ'}</span>`; unlockAchievement('perfect'); }
+  if(state.correctCount >= 10){ ach.innerHTML += `<span class="achievement">⚖️ ${LANG === 'en' ? 'Legal Expert' : 'Правовед'}</span>`; unlockAchievement('smart'); }
+  if(state.correctCount >= 5){ ach.innerHTML += `<span class="achievement">🛡️ ${LANG === 'en' ? 'Admin Code Expert' : 'Знаток КоАП'}</span>`; unlockAchievement('koadm'); }
+
+  updateStreakOnPlay();
+
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  quoteBlock.style.display = 'block';
+  quoteBlock.innerHTML = `«${LANG === 'en' ? q.textEn : q.text}»<span class="author">— ${LANG === 'en' ? q.authorEn : q.author}</span>`;
+
+  if(percent === 100){
+    certBlock.style.display = 'block';
+    certBlock.innerHTML = `
+      <div class="certificate">
+        <h3>${t('cert-title')}</h3>
+        <div class="sub">${t('cert-sub')}</div>
+        <div class="name">${t('cert-player')}</div>
+        <div class="desc">${t('cert-desc')}</div>
+        <div style="margin-top:16px; font-size:11px; color:#8b5a1f;">${new Date().toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU')}</div>
+      </div>
+      <button class="btn gold sm" onclick="printCertificate()">${t('cert-btn')}</button>
+    `;
+  }
+
+  saveBlock.style.display = 'block';
+  $('player-name').placeholder = t('result-name-ph');
+  saveBlock.dataset.score = state.score;
+  saveBlock.dataset.mode = 'single';
+}
+
+function printCertificate(){ window.print(); Sfx.click(); }
+
+/* ================= SAVE SCORE ================= */
+function saveScore(){
+  const nameInput = $('player-name');
+  const name = (nameInput.value || '').trim() || (LANG === 'en' ? 'Anonymous' : 'Аноним');
+  const score = parseInt($('save-score-block').dataset.score, 10) || 0;
+  const mode = $('save-score-block').dataset.mode || 'single';
+  const lb = loadLB();
+  lb.push({name: name.slice(0,16), score, mode, date: Date.now()});
+  const filtered = lb.filter(e => e.mode === mode).sort((a,b)=>b.score-a.score).slice(0,50);
+  const other = lb.filter(e => e.mode !== mode);
+  saveLB([...other, ...filtered]);
+  Sfx.correct();
+  $('save-score-block').style.display = 'none';
+  const ok = document.createElement('div');
+  ok.className = 'feedback show ok';
+  ok.style.marginTop = '16px';
+  ok.innerHTML = LANG === 'en'
+    ? `✅ <strong>Saved!</strong> ${name} — ${score} points.`
+    : `✅ <strong>Сохранено!</strong> ${name} — ${score} очков.`;
+  $('save-score-block').parentNode.insertBefore(ok, $('save-score-block').nextSibling);
+  const top = lb.filter(e=>e.mode===mode).sort((a,b)=>b.score-a.score)[0];
+  if(top && top.score === score && top.name === name.slice(0,16)) unlockAchievement('leader');
+}
+
+/* ================= MAP ================= */
+function showMap(){
+  Sfx.click();
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('map-screen').style.display = 'block';
+  renderMap();
+}
+
+function renderMap(){
+  const container = $('map-container');
+  container.innerHTML = '';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'map-svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  for(let i = 0; i < MAP_LOCATIONS.length - 1; i++){
+    const a = MAP_LOCATIONS[i];
+    const b = MAP_LOCATIONS[i+1];
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+    line.setAttribute('stroke', 'rgba(201,169,97,.25)');
+    line.setAttribute('stroke-width', '0.4');
+    line.setAttribute('stroke-dasharray', '1,1');
+    svg.appendChild(line);
+  }
+  container.appendChild(svg);
+
+  const progress = loadProgress();
+  MAP_LOCATIONS.forEach((loc, i) => {
+    const unlocked = i === 0 || progress.visitedLocations.includes(MAP_LOCATIONS[i-1].id);
+    const node = document.createElement('div');
+    node.className = 'map-node' + (unlocked ? '' : ' locked');
+    node.style.left = loc.x + '%';
+    node.style.top = loc.y + '%';
+    node.textContent = loc.icon;
+    node.title = LANG === 'en' ? loc.labelEn : loc.label;
+    if(unlocked){
+      node.onclick = () => { openMapLocation(loc); };
+    }
+    container.appendChild(node);
+    const label = document.createElement('div');
+    label.className = 'map-node-label';
+    label.style.left = loc.x + '%';
+    label.style.top = loc.y + '%';
+    label.textContent = LANG === 'en' ? loc.labelEn : loc.label;
+    container.appendChild(label);
+  });
+}
+
+function openMapLocation(loc){
+  Sfx.click();
+  const pool = LEVELS.filter(l => l.block.includes(loc.blockFilter));
+  if(pool.length === 0){ showToast(LANG === 'en' ? 'Cases coming soon' : 'Скоро здесь появятся кейсы'); return; }
+  state = {mode:'single', current: LEVELS.indexOf(pool[0]), score:0, correctCount:0, answered:false, duel:{p1:0,p2:0,turn:1,p1Answer:null}, jury:{step:0}, advocate:{step:0}, shuffle:state.shuffle, currentPool:null};
+  const progress = loadProgress();
+  if(!progress.visitedLocations.includes(loc.id)){
+    progress.visitedLocations.push(loc.id);
+    saveProgress(progress);
+    if(progress.visitedLocations.length >= 5) unlockAchievement('cartographer');
+  }
+  showGameScreen();
+  $('duel-header').style.display = 'none';
+  $('duel-hint').style.display = 'none';
+  $('jury-steps').style.display = 'none';
+  $('character-bubble').style.display = 'flex';
+  const c = getCharacterForBlock(loc.blockFilter);
+  $('character-avatar').textContent = c.avatar;
+  $('character-name').textContent = LANG === 'en' ? c.nameEn : c.name;
+  $('character-text').textContent = LANG === 'en'
+    ? `Welcome: ${loc.labelEn}. Let's study the cases.`
+    : `Добро пожаловать: ${loc.label}. Изучим кейсы.`;
+  renderLevel();
+}
+
+/* ================= FLASHCARDS ================= */
+function startFlashcards(){
+  Sfx.click();
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('fc-screen').style.display = 'block';
+  renderFlashcard();
+}
+function renderFlashcard(){
+  const card = REFERENCE[fcIdx];
+  $('fc-code').textContent = LANG === 'en' ? card.codeEn : card.code;
+  $('fc-name').textContent = LANG === 'en' ? card.nameEn : card.name;
+  $('fc-text').textContent = LANG === 'en' ? card.textEn : card.text;
+  $('fc-idx').textContent = fcIdx + 1;
+  $('fc-total').textContent = REFERENCE.length;
+  const el = $('flashcard');
+  el.classList.remove('flipped');
+  lsSet(STORAGE.fcIdx, fcIdx);
+}
+function flipCard(){ Sfx.swap(); $('flashcard').classList.toggle('flipped'); }
+function fcPrev(){ Sfx.click(); fcIdx = (fcIdx - 1 + REFERENCE.length) % REFERENCE.length; renderFlashcard(); }
+function fcNext(){
+  Sfx.click();
+  fcIdx = (fcIdx + 1) % REFERENCE.length;
+  renderFlashcard();
+  if(fcIdx === 20) unlockAchievement('flashmaster');
+}
+function fcRandom(){ Sfx.swap(); fcIdx = Math.floor(Math.random() * REFERENCE.length); renderFlashcard(); }
+
+/* ================= LEADERBOARD ================= */
+function showLeaderboard(){
+  Sfx.click();
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('lb-screen').style.display = 'block';
+  currentLbMode = 'single';
+  document.querySelectorAll('#lb-tabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('#lb-tabs .tab[data-mode="single"]').classList.add('active');
+  renderLeaderboard();
+}
+function switchLb(mode, el){
+  Sfx.click();
+  currentLbMode = mode;
+  document.querySelectorAll('#lb-tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderLeaderboard();
+}
+function renderLeaderboard(){
+  const list = $('lb-list');
+  if(currentLbMode === 'online'){
+    list.innerHTML = `<div class="empty-lb">${t('lb-online-empty')}<br><span style="font-size:11px; display:block; margin-top:8px;">${t('lb-online-hint')}</span></div>`;
+    return;
+  }
+  const entries = loadLB().filter(e => e.mode === currentLbMode).sort((a,b) => b.score - a.score).slice(0, 20);
+  if(entries.length === 0){
+    list.innerHTML = `<div class="empty-lb"><span style="font-size:44px; display:block; margin-bottom:12px; opacity:.35;">🏆</span>${t('lb-empty')}</div>`;
+    return;
+  }
+  list.innerHTML = '';
+  entries.forEach((e, i) => {
+    const rank = i + 1;
+    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+    const date = new Date(e.date).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'ru-RU', {day:'2-digit', month:'2-digit'});
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `<div class="lb-rank ${rankClass}">${rank}</div><div class="lb-name">${escapeHtml(e.name)}<div class="lb-meta">${date}</div></div><div class="lb-score">${e.score}</div>`;
+    list.appendChild(row);
+  });
+}
+function clearLeaderboard(){
+  const msg = LANG === 'en' ? 'Delete all local results?' : 'Удалить все локальные результаты?';
+  if(!confirm(msg)) return;
+  saveLB([]);
+  Sfx.click();
+  renderLeaderboard();
+}
+
+/* ================= PROFILE ================= */
+function showProfile(){
+  Sfx.click();
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('profile-screen').style.display = 'block';
+  renderProfile();
+}
+function renderProfile(){
+  const stats = loadStats();
+  const accuracy = stats.totalAnswered ? Math.round(stats.totalCorrect / stats.totalAnswered * 100) : 0;
+  const streak = loadStreak();
+  const grid = $('stats-grid');
+  grid.innerHTML = `
+    <div class="stat-card"><div class="label">${t('stat-games')}</div><div class="num">${stats.games}</div><div class="sub">${t('stat-games-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-acc')}</div><div class="num">${accuracy}%</div><div class="sub">${t('stat-acc-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-best')}</div><div class="num">${stats.bestScore}</div><div class="sub">${t('stat-best-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-streak')}</div><div class="num">${streak.count}🔥</div><div class="sub">${t('stat-streak-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-duel')}</div><div class="num">${stats.duelWins||0}</div><div class="sub">${t('stat-duel-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-jury')}</div><div class="num">${stats.juryWins||0}</div><div class="sub">${t('stat-jury-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-adv')}</div><div class="num">${stats.advocateWins||0}</div><div class="sub">${t('stat-adv-sub')}</div></div>
+    <div class="stat-card"><div class="label">${t('stat-daily')}</div><div class="num">${stats.dailyDone||0}</div><div class="sub">${t('stat-daily-sub')}</div></div>
+  `;
+  const bs = stats.blockStats || {};
+  const bsEl = $('block-stats');
+  bsEl.innerHTML = '';
+  const blocks = [
+    {key:'Блок 1', label: LANG === 'en' ? 'Block 1' : 'Блок 1'},
+    {key:'Блок 2', label: LANG === 'en' ? 'Block 2' : 'Блок 2'},
+    {key:'Блок 3', label: LANG === 'en' ? 'Block 3' : 'Блок 3'},
+    {key:'Блок 4', label: LANG === 'en' ? 'Block 4' : 'Блок 4'},
+    {key:'Блок 5', label: LANG === 'en' ? 'Block 5' : 'Блок 5'}
+  ];
+  blocks.forEach(b => {
+    const s = bs[b.key] || {correct:0, total:0};
+    const pct = s.total ? Math.round(s.correct/s.total*100) : 0;
+    const bar = document.createElement('div');
+    bar.style.cssText = 'margin-bottom:8px;';
+    bar.innerHTML = `
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-2); margin-bottom:4px;">
+        <span>${b.label}</span><span>${pct}%</span>
+      </div>
+      <div style="height:6px; background:rgba(148,163,184,.15); border-radius:100px; overflow:hidden;">
+        <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, var(--bordeaux-2), var(--accent)); border-radius:100px; transition:width .5s;"></div>
+      </div>
+    `;
+    bsEl.appendChild(bar);
+  });
+  const ach = loadAch();
+  const ag = $('ach-grid');
+  ag.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = !!ach[a.id];
+    const c = document.createElement('div');
+    c.className = 'ach-card' + (unlocked ? ' unlocked' : '');
+    c.innerHTML = `<span class="icon">${a.icon}</span><div class="name">${LANG === 'en' ? a.nameEn : a.name}</div><div class="desc">${LANG === 'en' ? a.descEn : a.desc}</div>`;
+    ag.appendChild(c);
+  });
+}
+
+/* ================= SETTINGS ================= */
+function showSettings(){
+  Sfx.click();
+  const stats = loadStats();
+  const lb = loadLB();
+  const ach = loadAch();
+  const theme = lsGet(STORAGE.theme, 'dark');
+  const ambience = lsGet(STORAGE.ambience, false);
+  const data = {stats, lb, ach, theme, lang:LANG, version:61};
+  openModal(`
+    <h2>${t('settings-title')}</h2>
+    <p style="font-weight:600; margin-bottom:8px;">${t('settings-theme')}</p>
+    <div class="theme-switcher">
+      <div class="theme-opt ${theme === 'dark' ? 'active' : ''}" onclick="selectTheme('dark', this)">${t('settings-theme-dark')}</div>
+      <div class="theme-opt ${theme === 'light' ? 'active' : ''}" onclick="selectTheme('light', this)">${t('settings-theme-light')}</div>
+      <div class="theme-opt ${theme === 'sepia' ? 'active' : ''}" onclick="selectTheme('sepia', this)">${t('settings-theme-sepia')}</div>
+    </div>
+
+    <p style="font-weight:600; margin:14px 0 8px;">${t('settings-lang')}</p>
+    <div class="theme-switcher">
+      <div class="theme-opt ${LANG === 'ru' ? 'active' : ''}" onclick="selectLang('ru', this)">${t('settings-lang-ru')}</div>
+      <div class="theme-opt ${LANG === 'en' ? 'active' : ''}" onclick="selectLang('en', this)">${t('settings-lang-en')}</div>
+    </div>
+
+    <p style="font-weight:600; margin:14px 0 8px;">${t('settings-shuffle')}</p>
+    <div class="theme-switcher">
+      <div class="theme-opt ${!state.shuffle ? 'active' : ''}" onclick="selectShuffle(false, this)">${t('settings-no')}</div>
+      <div class="theme-opt ${state.shuffle ? 'active' : ''}" onclick="selectShuffle(true, this)">${t('settings-yes')}</div>
+    </div>
+
+    <p style="font-weight:600; margin:14px 0 8px;">${t('settings-music')}</p>
+    <div class="theme-switcher">
+      <div class="theme-opt ${!ambience ? 'active' : ''}" onclick="selectAmbience(false, this)">${t('settings-off')}</div>
+      <div class="theme-opt ${ambience ? 'active' : ''}" onclick="selectAmbience(true, this)">${t('settings-on')}</div>
+    </div>
+
+    <p style="font-weight:600; margin:14px 0 8px;">${t('settings-export')}</p>
+    <textarea id="export-area" readonly>${JSON.stringify(data)}</textarea>
+    <button class="btn gold sm" onclick="copyExport()">${t('settings-copy')}</button>
+
+    <p style="font-weight:600; margin:14px 0 8px;">${t('settings-import')}</p>
+    <textarea id="import-area" placeholder='{"stats":{...},"lb":[...]}'></textarea>
+    <div class="modal-buttons">
+      <button class="btn ghost" onclick="closeModal()">${t('settings-close')}</button>
+      <button class="btn" onclick="importData()">${t('settings-import-btn')}</button>
+    </div>
+    <button class="btn ghost" style="margin-top:14px;" onclick="resetAll()">${t('settings-reset')}</button>
+  `);
+}
+
+function selectTheme(theme, el){
+  Sfx.click();
+  applyTheme(theme);
+  el.parentElement.querySelectorAll('.theme-opt').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function selectLang(lang, el){
+  Sfx.click();
+  LANG = lang;
+  lsSet(STORAGE.lang, lang);
+  applyLang();
+  el.parentElement.querySelectorAll('.theme-opt').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function selectShuffle(val, el){
+  Sfx.click();
+  state.shuffle = val;
+  lsSet(STORAGE.shuffle, val);
+  el.parentElement.querySelectorAll('.theme-opt').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function selectAmbience(val, el){
+  Sfx.click();
+  lsSet(STORAGE.ambience, val);
+  if(val) Ambience.start();
+  else Ambience.stop();
+  el.parentElement.querySelectorAll('.theme-opt').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function copyExport(){
+  const area = $('export-area');
+  area.select();
+  try{ document.execCommand('copy'); showToast(t('toast-copied')); }catch(e){}
+  Sfx.click();
+}
+function importData(){
+  try{
+    const raw = $('import-area').value.trim();
+    if(!raw){ showToast(t('toast-empty')); return; }
+    const data = JSON.parse(raw);
+    if(data.stats) saveStats(data.stats);
+    if(data.lb) saveLB(data.lb);
+    if(data.ach) saveAch(data.ach);
+    if(data.theme) applyTheme(data.theme);
+    if(data.lang){ LANG = data.lang; lsSet(STORAGE.lang, LANG); applyLang(); }
+    showToast(t('toast-imported'));
+    closeModal();
+  }catch(e){ showToast(t('toast-import-error')); }
+}
+function resetAll(){
+  if(!confirm(t('settings-reset-confirm'))) return;
+  Object.values(STORAGE).forEach(lsDel);
+  showToast(t('toast-reset'));
+  setTimeout(() => location.reload(), 800);
+}
+
+/* ================= REFERENCE ================= */
+function showReference(){
+  Sfx.click();
+  unlockAchievement('weekly');
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  $('hud').style.display = 'none';
+  $('progress-wrap').style.display = 'none';
+  $('ref-screen').style.display = 'block';
+  renderRef('all');
+}
+function renderRef(cat, query){
+  const list = $('ref-list');
+  let items = REFERENCE.filter(r => cat === 'all' || r.cat === cat);
+  if(query){
+    const q = query.toLowerCase();
+    items = items.filter(r =>
+      r.code.toLowerCase().includes(q) ||
+      (r.codeEn || '').toLowerCase().includes(q) ||
+      r.name.toLowerCase().includes(q) ||
+      (r.nameEn || '').toLowerCase().includes(q) ||
+      r.text.toLowerCase().includes(q) ||
+      (r.textEn || '').toLowerCase().includes(q)
+    );
+  }
+  list.innerHTML = '';
+  if(items.length === 0){
+    list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--muted);">${t('ref-empty')}</div>`;
+    return;
+  }
+  items.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'ref-item';
+    const code = LANG === 'en' ? r.codeEn : r.code;
+    const name = LANG === 'en' ? r.nameEn : r.name;
+    const text = LANG === 'en' ? r.textEn : r.text;
+    div.innerHTML = `<div class="code">${code}</div><div class="name">${name}</div><div class="text">${text}</div>`;
+    list.appendChild(div);
+  });
+}
+let currentRefCat = 'all';
+function filterRef(cat, el){
+  Sfx.click();
+  currentRefCat = cat;
+  document.querySelectorAll('#ref-tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderRef(cat, $('ref-search').value);
+}
+function searchRef(){ renderRef(currentRefCat, $('ref-search').value); }
+
+/* ================= UTILS ================= */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ================= INIT ================= */
+(function init(){
+  const theme = lsGet(STORAGE.theme, 'dark');
+  applyTheme(theme);
+  LANG = lsGet(STORAGE.lang, 'ru');
+  state.shuffle = lsGet(STORAGE.shuffle, false);
+  applyLang();
+  if(lsGet(STORAGE.ambience, false)){
+    setTimeout(() => Ambience.start(), 800);
+  }
+  updateDailyBtn();
+})();
+</script>
+</body>
+</html>
